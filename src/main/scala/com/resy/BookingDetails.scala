@@ -20,7 +20,7 @@ object BookingDetails {
   val times: Seq[String] = CustomDetails.pref_times
 
   // Size of party
-  val partySize = "2"
+  val partySize: String = CustomDetails.partySize
 
   //Hour of Day to Wake Up the Bot and start searching - In Military Time: 0-23
   val hourOfDayToStartBooking: Int = CustomDetails.hourOfDayToStartBooking
