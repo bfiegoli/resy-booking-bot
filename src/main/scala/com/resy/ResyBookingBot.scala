@@ -44,13 +44,18 @@ object ResyBookingBot{
     println(s"Attempting to snipe reservation at ${DateTime.now}")
 
     //Try to get configId of the time slot for 10 seconds
-    val findResResp = retryFindReservation(DateTime.now.plusSeconds(10).getMillis)
+    val findResResp = retryFindReservation(DateTime.now.plusSeconds(30).getMillis)
 
     //Try to book the reservation
     for {
       resDetailsResp <- getReservationDetails(findResResp)
       bookResResp    <- bookReservation(resDetailsResp)
     } {
+
+      val bookDetails = Json.parse(bookResResp)
+      println(s"${DateTime.now} URL Response - booking: $bookDetails")
+
+
       val resyToken =
         Try(
           (Json.parse(bookResResp) \ "resy_token").get.toString

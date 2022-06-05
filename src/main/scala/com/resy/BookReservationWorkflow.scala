@@ -82,6 +82,7 @@ object BookReservationWorkflow {
     */
   @tailrec
   def retryFindReservation(endTime: Long): String = {
+    println("Attempting to find reservation slot")
     val findResResp = Await.result(findReservation, 6 seconds)
 
     println(s"${DateTime.now} URL Response: $findResResp")
@@ -96,30 +97,32 @@ object BookReservationWorkflow {
 
     results match {
       case Success(reservationTimes) =>
-        findReservationTime(reservationTimes, times, dining_type )
+        findReservationTime(reservationTimes, times, dining_type, endTime)
       case Failure(_) if endTime - DateTime.now.getMillis > 0 =>
         retryFindReservation(endTime)
       case _ =>
-        throw new Exception(JsError("Could not find a reservation for the given time(s)"))
+        throw new Exception(JsError("Could not find a reservation slot"))
     }
   }
 
   @tailrec
   private[this] def findReservationTime(
     reservationTimes: IndexedSeq[JsValue],
-    timePref: Seq[String],
-    typePref: String
+    timePrefsLeft: Seq[String],
+    typePref: String,
+    endTime: Long
   ): String = {
+    println("Attempting to find reservation time from prefs")
     val reservation =
       if (typePref.isEmpty) {
         Try(
-          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""")(
+          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePrefsLeft.head}"""")(
             0
           ) \ "config" \ "token").get.toString
         )
       } else {
         Try(
-          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePref.head}"""" && (x \ "config" \ "type").get.toString.equalsIgnoreCase(s""""${typePref}""""))(
+          (reservationTimes.filter(x => (x \ "date" \ "start").get.toString == s""""${timePrefsLeft.head}"""" && (x \ "config" \ "type").get.toString.equalsIgnoreCase(s""""${typePref}""""))(
             0
           ) \ "config" \ "token").get.toString
         )
@@ -129,8 +132,11 @@ object BookReservationWorkflow {
       case Success(configId) =>
         println(s"${DateTime.now} Config Id: $configId")
         configId.substring(1, configId.length()-1)
-      case Failure(_) if timePref.size > 0 =>
-        findReservationTime(reservationTimes, timePref.tail, typePref)
+      case Failure(_) if timePrefsLeft.nonEmpty =>
+        findReservationTime(reservationTimes, timePrefsLeft.tail, typePref, endTime)
+      case Failure(_) if timePrefsLeft.isEmpty && (endTime - DateTime.now.getMillis) > 0 =>
+        println("Couldn't find reservation at given time(s), trying again...")
+        retryFindReservation(endTime) //retry again until endtime is up
       case _ =>
         throw new Exception(JsError("Could not find a reservation for the given time(s)"))
     }
