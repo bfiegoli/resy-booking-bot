@@ -84,7 +84,8 @@ object ResyApiWrapper {
         ws.url(url)
           .withHttpHeaders(
             "Content-Type"  -> "application/x-www-form-urlencoded",
-            "Authorization" -> s"""ResyAPI api_key="$api_key""""
+            "Authorization" -> s"""ResyAPI api_key="$api_key"""",
+            "origin" -> "https://widgets.resy.com/"
           )
           .post(post)
           .map(_.body)(system.dispatcher)

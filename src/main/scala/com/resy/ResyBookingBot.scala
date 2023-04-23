@@ -37,6 +37,7 @@ object ResyBookingBot{
     println(
       s"Sleeping for $hoursRemaining hours, $minutesRemaining minutes and $secondsRemaining seconds"
     )
+
     system.scheduler.scheduleOnce(millisUntilStart millis)(bookReservationWorkflow)
   }
 
