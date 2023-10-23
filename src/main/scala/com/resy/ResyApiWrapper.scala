@@ -50,7 +50,7 @@ object ResyApiWrapper {
   )
 
   def sendGetRequest(resyApiMapKey: ResyApiMapKey, queryParams: Map[String, String])(implicit
-    testing: Boolean
+                                                                                     testing: Boolean
   ): Future[String] = {
     val apiDetails = apiMap.get(resyApiMapKey).get
     val url =
@@ -70,7 +70,7 @@ object ResyApiWrapper {
   }
 
   def sendPostRequest(resyApiMapKey: ResyApiMapKey, queryParams: Map[String, String])(implicit
-    testing: Boolean
+                                                                                      testing: Boolean
   ): Future[String] = {
     val apiDetails = apiMap.get(resyApiMapKey).get
     val url        = s"https://${apiDetails.url}"
@@ -85,6 +85,8 @@ object ResyApiWrapper {
           .withHttpHeaders(
             "Content-Type"  -> "application/x-www-form-urlencoded",
             "Authorization" -> s"""ResyAPI api_key="$api_key"""",
+            "user-agent" -> "Mozilla",
+            "referer" -> "https://widgets.resy.com/",
             "origin" -> "https://widgets.resy.com/"
           )
           .post(post)
@@ -96,14 +98,14 @@ object ResyApiWrapper {
 
   private[this] def stringifyQueryParams(queryParams: Map[String, String]): String = {
     queryParams.foldLeft("") { (combined, tuple) =>
-      {
-        //i don't wanna encode this
-        if (tuple._1 == "config_id") {
-          combined + s"""${tuple._1}=${tuple._2}&"""
-        } else {
-          combined + s"""${tuple._1}=${URLEncoder.encode(tuple._2, "UTF-8")}&"""
-        }
+    {
+      //i don't wanna encode this
+      if (tuple._1 == "config_id") {
+        combined + s"""${tuple._1}=${tuple._2}&"""
+      } else {
+        combined + s"""${tuple._1}=${URLEncoder.encode(tuple._2, "UTF-8")}&"""
       }
+    }
     }
   }
 
@@ -114,8 +116,8 @@ object ResyApiWrapper {
   }
 
   private[this] case class ApiDetails(
-    val url: String,
-    val testSuccessResponse: String,
-    val testFailureRespnse: String
-  )
+                                       val url: String,
+                                       val testSuccessResponse: String,
+                                       val testFailureRespnse: String
+                                     )
 }

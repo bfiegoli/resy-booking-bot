@@ -38,8 +38,12 @@ object ResyBookingBot{
       s"Sleeping for $hoursRemaining hours, $minutesRemaining minutes and $secondsRemaining seconds"
     )
 
-    system.scheduler.scheduleOnce(millisUntilStart millis)(bookReservationWorkflow)
+  system.scheduler.scheduleOnce(millisUntilStart millis)(bookReservationWorkflow)
   }
+  //bookReservationWorkflow
+
+  //To test bot without clock comment out system.scheduler.scheduleOnce(millisUntilStart millis)(bookReservationWorkflow) and uncomment bookReservationWorkflow.
+
 
   def bookReservationWorkflow = {
     println(s"Attempting to snipe reservation at ${DateTime.now}")
