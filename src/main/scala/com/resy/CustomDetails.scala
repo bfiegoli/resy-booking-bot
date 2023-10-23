@@ -61,7 +61,7 @@ object  CustomDetails {
 //Laser Wolf = 58848 - 10 am - 21 days out - "Dining Room" - Tables up to 8
 //The Nine's = 7490 - 14 days in advance - "Dinner"
 //Wenwen = 59536 - 12 am - 14 days in advance - "Dining"
-//Rezdora = 5771 - "Indoor Dining"
+//Rezdora = 5771 - 30 days in advance - "Dining Room"
 //Peak = 10087 - 9 am - 21 days in advance - "Dining Room"
 //iSodi = 443 - 12 am - 13 days in Advance - "Dining Room", "Sidewalk"
 //Ernestos = 6588 - 12 am - 14 days in advance - "Dining Room"
