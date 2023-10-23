@@ -68,6 +68,7 @@ object  CustomDetails {
 //Lillia = 418 - 30 days in advance - "Indoor", "Piazza"
 //Frenchette = 1946 - 30 days in adcance - "Dining Room"
 //Misi = 2015 = 28 days in advance - "Dining Room"
+//Bangkok Supper Club = 73418 - "Main Dining Room"
 //Semma = 1263 - 12 am - 30 days in advance - "Dining Room"
 //Dhamaka = 48994 - 12 am - 30 days in advance - "Indoor"
 //Cafe Spagetti = 59220 - 10 am - 14 days in advance - "Dining Room", "Backyard" - Sal Lamboglia Cell - 917-400-9498
