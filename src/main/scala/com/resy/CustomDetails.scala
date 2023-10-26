@@ -21,7 +21,7 @@ object  CustomDetails {
   val pref_day = "2023-11-20"
 
   //indoor or outdoor etc. Should match the type exactly on the resy venue (case doesn't matter). Leave blank if you don't care or don't now
-  val dining_type= ""
+  val dining_type= "Dining Room"
   //If you don't want a dining type just use ""
 
   // Seq of YYYY-MM-DD HH:MM:SS times of reservations in military time format in EST. This list will run in order of preference
@@ -46,7 +46,7 @@ object  CustomDetails {
 }
 
 
-//El Rio Grande = 1740 // "Dining Room" - Used for testing - Always has available reservations
+//El Rio Grande = 1740 - "Dining Room" - Used for testing - Always has available reservations
 //L'Artusi = 25973 - 9 am - 14 days in advance - "Indoor Dining", "Outdoor Patio"
 //Via Carota = 2567 - 10 am - 30 days in advance - "Indoor Dining Room"
 //4 Charles Prime Rib = 834 - 9 am - 30 days in advance - "Dining Room", "Patio" - contact@nycprimerib.com - 212-561-5992
@@ -74,9 +74,11 @@ object  CustomDetails {
 //Monkey Bar = 60058 - 9 am - 14 days in advance - "Dining"
 //Double Chicken Please = 42534 - 12 am - 6 days in advance - “Bar”, "Booth"
 //Torrisi = 64593 - 10 am - 30 days in advance - "Dining Room", "Bar Room", "Bar Table"
-//Tatiana = 65452 = 28 days in advance at 12 ET
-//AMEX Centurion Lounge = 66930 - 9 am - 30 days in advance
-//Blue Box Cafe = 70161 = 12 am - 30 days in advance - "Dining Room"
+//Tatiana = 65452 - 28 days in advance at 12 ET
+//AMEX Centurion Lounge - 66930 - 9 am - 30 days in advance
+//Blue Box Cafe = 70161 - 12 am - 30 days in advance - "Dining Room"
+//Sailor = 73658 - 12 pm - 21st of each month for the entire month that follows - ex) Sept 21 will release all october dates and the remainder of september - Restaurant open Wednesday to Sunday starting at 5pm
+//Swoony's = 74094 - 14 days out - "Dining room"
 
 //To find new ID, inspect and go to network tab, find?lat and take request response into JSON viewer
 
