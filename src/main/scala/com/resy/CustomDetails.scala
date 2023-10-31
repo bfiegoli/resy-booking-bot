@@ -4,7 +4,7 @@ object  CustomDetails {
   // Your user profile Auth Token
 
   //Brandon F
-  val auth_token: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJleHAiOjE2OTk2MjI2NDksInVpZCI6MjEwMDU0OSwiZ3QiOiJjb25zdW1lciIsImdzIjpbXSwibGFuZyI6ImVuLXVzIiwiZXh0cmEiOnsiZ3Vlc3RfaWQiOjEzMzAwMTQ2fX0.ABYHgSs9IIhSfcJrnLGU2mwca-k5-TElBzW5QPXF7VJ_qFUwJopnFbPln88I8QNrL9LtVWudH-4s_C3581lXvU2_ADCoT-y0xBQs_Nn3LLqMifsjxRg9epVdzLeCoVkrigIMtXcD7TV9cpMxzUvw-S2NeTI0ahM6rNfCBnpHGYcLwPsU"
+  val auth_token: String = ""
   //Go to Resy - Open up Console and go run network requests - Search for "find" and go to headers and find the "X-Resy-Auth-Token:"
   // Your user profile API key. Always put in " "
 
@@ -15,10 +15,10 @@ object  CustomDetails {
   //TODO REMEMBER TO CHANGE ALL BELOW
 
   // RestaurantId where you want to make the reservation
-  val venueId = "65452"
+  val venueId = "58848"
 
   // YYYY-MM-DD of reservation
-  val pref_day = "2023-11-20"
+  val pref_day = "2023-11-19"
 
   //indoor or outdoor etc. Should match the type exactly on the resy venue (case doesn't matter). Leave blank if you don't care or don't now
   val dining_type= "Dining Room"
@@ -27,19 +27,19 @@ object  CustomDetails {
   // Seq of YYYY-MM-DD HH:MM:SS times of reservations in military time format in EST. This list will run in order of preference
   val pref_times = Seq(
 
-    "2023-11-20 19:30:00",
-    "2023-11-20 19:00:00",
-    "2023-11-20 20:00:00",
-    "2023-11-20 20:30:00",
-    "2023-11-20 18:30:00",
-    "2023-11-20 18:00:00"
+    "2023-11-19 19:00:00",
+    "2023-11-19 19:30:00",
+    "2023-11-19 18:30:00",
+    "2023-11-19 18:00:00",
+    "2023-11-19 20:00:00",
+    "2023-11-19 17:30:00"
 
   )
 
   // Size of party
-  val partySize = "4"
+  val partySize = "8"
 
-  val hourOfDayToStartBooking = 12
+  val hourOfDayToStartBooking = 10
   //in military time
 
   //TODO UP TO HERE
