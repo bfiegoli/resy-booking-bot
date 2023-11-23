@@ -74,9 +74,9 @@ object ResyBookingBot extends App with StrictLogging {
     logger.info("Within booking window for venue - attempting immediate reservation")
     bookReservationWorkflow()
   } else {
-    val durationToSleep: FiniteDuration = config.minutesToBookingWindowStart(leadTime)
+    val durationToSleep: FiniteDuration = config.secondsToBookingWindowStart(leadTime) - config.wakeAdjustment
     logger.info(s"Booking window is ${leadTime.days} - bringing us to: ${config.bookingWindowStart(leadTime)}")
-    logger.info(s"Sleeping for ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm")}")
+    logger.info(s"Sleeping for ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}")
     system.scheduler.scheduleOnce(durationToSleep)(bookReservationWorkflow())
   }
 }
