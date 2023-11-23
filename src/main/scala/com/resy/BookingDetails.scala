@@ -1,27 +1,42 @@
 package com.resy
 
-object BookingDetails {
-  // Your user profile Auth Token
-  val auth_token: String = CustomDetails.auth_token
+import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import scala.concurrent.duration._
 
-  // Your user profile API key
-  val api_key: String = CustomDetails.api_key
+final case class Venue(
+  id: String,
+  hourOfDayToStartBooking: Int,
+  advance: FiniteDuration,
+  diningTypes: List[String],
+  info: Option[String]
+)
 
-  // RestaurantId where you want to make the reservation
-  val venueId: String = CustomDetails.venueId
+final case class Preference(
+  time: LocalTime,
+  diningType: Option[String] = None
+)
 
-  // YYYY-MM-DD of reservation
-  val day: String = CustomDetails.pref_day
+final case class BookingDetails(
+                                 authToken: String,
+                                 apiKey: String,
+                                 venue: Venue,
+                                 date: LocalDate,
+                                 preferences: List[Preference],
+                                 partySize: String,
+                                 retryTimeout: FiniteDuration
+) {
 
-  //indoor or outdoor etc. Should match the type exactly on the resy venue (case doesn't matter). Leave blank if you don't care or don't now
-  val dining_type: String = CustomDetails.dining_type
+  val day: String = date.format(DateTimeFormatter.ISO_DATE)
 
-  // Seq of YYYY-MM-DD HH:MM:SS times of reservations in military time format
-  val times: Seq[String] = CustomDetails.pref_times
+  def bookingWindowStart(leadTime: Int): LocalDateTime =
+    date.minus(leadTime - 1, ChronoUnit.DAYS)
+      .atStartOfDay()
+      .plusHours(venue.hourOfDayToStartBooking)
 
-  // Size of party
-  val partySize: String = CustomDetails.partySize
+  def inBookingWindow(leadTime: Int): Boolean = bookingWindowStart(leadTime).isBefore(LocalDateTime.now())
 
-  //Hour of Day to Wake Up the Bot and start searching - In Military Time: 0-23
-  val hourOfDayToStartBooking: Int = CustomDetails.hourOfDayToStartBooking
+  def minutesToBookingWindowStart(leadTime: Int): FiniteDuration =
+    (bookingWindowStart(leadTime).toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)).seconds.toMinutes.minutes
 }
