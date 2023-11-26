@@ -23,3 +23,8 @@ lazy val root = Project("resy-booking-bot", file("."))
       "org.mockito"                 % "mockito-core"    % "5.1.1" % Test,
     )
   )
+
+assembly / assemblyMergeStrategy := {
+  case PathList("module-info.class") => MergeStrategy.discard
+  case x => (assembly / assemblyMergeStrategy).value(x)
+}

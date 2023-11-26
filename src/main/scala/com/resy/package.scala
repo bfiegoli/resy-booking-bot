@@ -19,7 +19,7 @@ package object resy {
 
   implicit val localDateTimeConverter: ConfigConvert[LocalDateTime] = localDateTimeConfigConvert(DateTimeFormatter.ISO_DATE_TIME)
 
-  case class ReservationAlreadyMade(body: String) extends Exception {
+  final case class ReservationAlreadyMade(body: String) extends Exception {
     private val json = Json.parse(body)
 
     val date: LocalDate = (json \ "specs" \ "day").as[LocalDate]
@@ -27,7 +27,7 @@ package object resy {
     val id: String = (json \ "specs" \ "reservation_id").get.toString()
   }
 
-  case class Slot(start: LocalDateTime, diningType: Option[String], token: Option[String]) {
+  final case class Slot(start: LocalDateTime, diningType: Option[String], token: Option[String]) {
     def asPreference: Preference = Preference(start.toLocalTime, diningType)
   }
 }
