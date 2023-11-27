@@ -31,7 +31,7 @@ final case class BookingDetails(
   val day: String = date.format(DateTimeFormatter.ISO_DATE)
 
   def bookingWindowStart(leadTime: Int): LocalDateTime =
-    date.minus(leadTime - 1, ChronoUnit.DAYS)
+    date.minus(leadTime, ChronoUnit.DAYS)
       .atStartOfDay()
       .plusHours(venue.hourOfDayToStartBooking)
 
