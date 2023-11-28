@@ -25,7 +25,8 @@ final case class BookingDetails(
                                  date: LocalDate,
                                  preferences: List[Preference],
                                  partySize: String,
-                                 retryTimeout: FiniteDuration
+                                 retryTimeout: FiniteDuration,
+                                 wakeAdjustment: FiniteDuration
 ) {
 
   val day: String = date.format(DateTimeFormatter.ISO_DATE)
@@ -37,6 +38,6 @@ final case class BookingDetails(
 
   def inBookingWindow(leadTime: Int): Boolean = bookingWindowStart(leadTime).isBefore(LocalDateTime.now())
 
-  def minutesToBookingWindowStart(leadTime: Int): FiniteDuration =
-    (bookingWindowStart(leadTime).toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)).seconds.toMinutes.minutes
+  def secondsToBookingWindowStart(leadTime: Int): FiniteDuration =
+    (bookingWindowStart(leadTime).toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)).seconds
 }

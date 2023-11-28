@@ -95,9 +95,14 @@ object BookReservationWorkflow extends StrictLogging {
         (v \ "config" \ "type").asOpt[String],
         (v \ "config" \ "token").asOpt[String]
       )}
+      .tap(listBookingTypes)
       .filter(s => bookingDetails.preferences.contains(s.asPreference) || bookingDetails.preferences.contains(s.asPreference.copy(diningType = None)))
       .map(_.token)
       .head
       .tap(v => logger.info(s"Config Id: $v"))
+  }
+
+  def listBookingTypes: Seq[Slot] => Unit = { slots =>
+    logger.info(slots.flatMap(_.diningType).distinct.mkString("Distinct dining-types: [\"", "\", \"", "\"]"))
   }
 }
