@@ -1,7 +1,7 @@
 package com.resy
 
-import akka.actor.ActorSystem
 import com.typesafe.scalalogging.StrictLogging
+import org.apache.pekko.actor.ActorSystem
 import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.ahc.{AhcCurlRequestLogger, AhcWSClient}
@@ -15,8 +15,6 @@ class ResyApiWrapper extends StrictLogging {
   implicit private val dispatcher: ExecutionContextExecutor = system.dispatcher
 
   private val ws = AhcWSClient()
-
-  def shutdown(): Unit = ws.close()
 
   private val commonHeaders: BookingDetails => Seq[(String, String)] = details =>
     Seq(
@@ -38,6 +36,8 @@ class ResyApiWrapper extends StrictLogging {
       logger.error(s"HTTP ERROR: ${resp.status}: ${resp.body}")
       Left(new Exception(resp.statusText))
   }
+
+  def shutdown(): Unit = ws.close()
 
   def execute(apiDetails: ApiDetails, queryParams: Map[String, String] = Map.empty)(implicit
     details: BookingDetails

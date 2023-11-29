@@ -44,7 +44,9 @@ package object resy {
     val id: String      = (json \ "specs" \ "reservation_id").get.toString()
   }
 
-  final case class Slot(start: LocalDateTime, diningType: Option[String], token: Option[String]) {
-    def asPreference: Preference = Preference(start.toLocalTime, diningType)
-  }
+  final class Slot(
+    start: LocalDateTime,
+    override val diningType: Option[String],
+    val token: Option[String]
+  ) extends Preference(time = start.toLocalTime)
 }
