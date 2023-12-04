@@ -20,11 +20,11 @@ lazy val root = Project("resy-booking-bot", file("."))
       "ch.qos.logback"              % "logback-classic" % "1.4.11",
       "org.apache.commons"          % "commons-lang3"   % "3.12.0",
       "org.scalatest"              %% "scalatest"       % "3.2.15" % Test,
-      "org.mockito"                 % "mockito-core"    % "5.1.1" % Test,
+      "org.mockito"                 % "mockito-core"    % "5.1.1"  % Test
     )
   )
 
 assembly / assemblyMergeStrategy := {
   case PathList("module-info.class") => MergeStrategy.discard
-  case x => (assembly / assemblyMergeStrategy).value(x)
+  case x                             => (assembly / assemblyMergeStrategy).value(x)
 }
