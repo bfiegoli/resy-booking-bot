@@ -8,6 +8,9 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.eed3si9n.fix"    %% "scalafix-noinfer" % "0.1.0-M1"
 )
 
+ThisBuild / dynverSeparator := "-"
+ThisBuild / dynverSonatypeSnapshots := true
+
 lazy val root = Project("resy-booking-bot", file("."))
   .settings(
     semanticdbEnabled := true,
