@@ -1,16 +1,18 @@
 package com.resy
 
-import java.time.{LocalDate, LocalDateTime, LocalTime, ZoneOffset}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.time._
+import java.util.TimeZone
 import scala.concurrent.duration._
 
 final case class Venue(
   id: String,
-  hourOfDayToStartBooking: Int,
-  advance: FiniteDuration,
-  diningTypes: List[String],
-  info: Option[String]
+  hourOfDayToStartBooking: Int = 0,
+  advance: FiniteDuration = 7.days,
+  diningTypes: List[String] = List.empty,
+  info: Option[String] = None,
+  timeZone: TimeZone = TimeZone.getTimeZone("America/New_York")
 )
 
 final case class Preference(
@@ -19,25 +21,29 @@ final case class Preference(
 )
 
 final case class BookingDetails(
-                                 authToken: String,
-                                 apiKey: String,
-                                 venue: Venue,
-                                 date: LocalDate,
-                                 preferences: List[Preference],
-                                 partySize: String,
-                                 retryTimeout: FiniteDuration,
-                                 wakeAdjustment: FiniteDuration
+  authToken: String,
+  apiKey: String,
+  venue: Venue,
+  date: LocalDate,
+  preferences: List[Preference],
+  partySize: String,
+  retryTimeout: FiniteDuration,
+  wakeAdjustment: FiniteDuration
 ) {
 
   val day: String = date.format(DateTimeFormatter.ISO_DATE)
 
-  def bookingWindowStart(leadTime: Int): LocalDateTime =
-    date.minus(leadTime, ChronoUnit.DAYS)
-      .atStartOfDay()
+  def bookingWindowStart(leadTime: FiniteDuration): ZonedDateTime =
+    date
+      .atStartOfDay(venue.timeZone.toZoneId)
+      .minus(leadTime.toDays, ChronoUnit.DAYS)
       .plusHours(venue.hourOfDayToStartBooking)
 
-  def inBookingWindow(leadTime: Int): Boolean = bookingWindowStart(leadTime).isBefore(LocalDateTime.now())
+  def inBookingWindow(leadTime: FiniteDuration): Boolean =
+    bookingWindowStart(leadTime).toLocalDateTime.isBefore(LocalDateTime.now())
 
-  def secondsToBookingWindowStart(leadTime: Int): FiniteDuration =
-    (bookingWindowStart(leadTime).toEpochSecond(ZoneOffset.UTC) - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)).seconds
+  def secondsToBookingWindowStart(leadTime: FiniteDuration): FiniteDuration =
+    (bookingWindowStart(leadTime).toEpochSecond - LocalDateTime
+      .now()
+      .toEpochSecond(ZoneOffset.UTC)).seconds
 }

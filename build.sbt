@@ -8,6 +8,13 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.eed3si9n.fix"    %% "scalafix-noinfer" % "0.1.0-M1"
 )
 
+ThisBuild / dynverSeparator := "-"
+ThisBuild / dynverSonatypeSnapshots := true
+ThisBuild / githubOwner := "Nugs"
+ThisBuild / githubRepository := name.value
+(ThisBuild / githubTokenSource).withRank(KeyRanks.Invisible) :=
+  TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token")
+
 lazy val root = Project("resy-booking-bot", file("."))
   .settings(
     semanticdbEnabled := true,
@@ -20,11 +27,11 @@ lazy val root = Project("resy-booking-bot", file("."))
       "ch.qos.logback"              % "logback-classic" % "1.4.11",
       "org.apache.commons"          % "commons-lang3"   % "3.12.0",
       "org.scalatest"              %% "scalatest"       % "3.2.15" % Test,
-      "org.mockito"                 % "mockito-core"    % "5.1.1" % Test,
+      "org.mockito"                 % "mockito-core"    % "5.1.1"  % Test
     )
   )
 
 assembly / assemblyMergeStrategy := {
   case PathList("module-info.class") => MergeStrategy.discard
-  case x => (assembly / assemblyMergeStrategy).value(x)
+  case x                             => (assembly / assemblyMergeStrategy).value(x)
 }

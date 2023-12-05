@@ -8,6 +8,8 @@ import play.api.libs.json._
 import pureconfig._
 import pureconfig.generic.auto._
 
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, TimeoutException}
@@ -39,7 +41,9 @@ object ResyBookingBot extends App with StrictLogging {
       case Failure(_: TimeoutException) =>
         logger.error(s"Failed to snipe - Retry period exceeded")
       case Failure(f: ReservationAlreadyMade) =>
-        logger.error(s"Failed to snipe - Reservation already in place! On ${f.date} at ${f.time} id: ${f.id}")
+        logger.error(
+          s"Failed to snipe - Reservation already in place! On ${f.date} at ${f.time} id: ${f.id}"
+        )
       case Failure(t) =>
         logger.error(s"Failed to snipe - ${t.getMessage}", t)
       case Success(Some(token)) =>
@@ -56,27 +60,23 @@ object ResyBookingBot extends App with StrictLogging {
     System.exit(0)
   }
 
-  val futLeadTime: Future[Int] = for {
-    venueDetails <- ResyApiWrapper.execute(ApiDetails.Config, Map("venue_id" -> config.venue.id))
-    lt <- Future.successful((Json.parse(venueDetails) \ "lead_time_in_days").as[Int])
-  } yield lt
-
-  val leadTime = Await.result(futLeadTime, config.retryTimeout)
-
-  if(leadTime.days != config.venue.advance) {
-    logger.warn("Please be aware - the venue's lead time for bookings differs to the local configuration!")
-    logger.warn(s"You probably want to amend when you start trying to book")
-    logger.warn(s"Resy says: ${leadTime.days}")
-    logger.warn(s"Config says: ${config.venue}")
-  }
-
-  if (config.inBookingWindow(leadTime)) {
-    logger.info("Within booking window for venue - attempting immediate reservation")
-    bookReservationWorkflow()
-  } else {
-    val durationToSleep: FiniteDuration = config.secondsToBookingWindowStart(leadTime) - config.wakeAdjustment
-    logger.info(s"Booking window is ${leadTime.days} - bringing us to: ${config.bookingWindowStart(leadTime)}")
-    logger.info(s"Sleeping for ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}")
-    system.scheduler.scheduleOnce(durationToSleep)(bookReservationWorkflow())
+  getLeadTime().map { leadTime =>
+    if (config.inBookingWindow(leadTime)) {
+      logger.info("Within booking window for venue - attempting immediate reservation")
+      bookReservationWorkflow()
+    } else {
+      val durationToSleep: FiniteDuration =
+        config.secondsToBookingWindowStart(leadTime) - config.wakeAdjustment
+      logger.info(
+        // format: off
+        s"""
+           |  Booking window is $leadTime available at ${config.venue.hourOfDayToStartBooking} ${config.venue.timeZone.getDisplayName}
+           |  For the current booking, we will wake ${config.wakeAdjustment} before ${config.bookingWindowStart(leadTime)}
+           |  Local time is currently                                ${ZonedDateTime.now().truncatedTo(ChronoUnit.MINUTES)}
+           |  Calculated sleep period of ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}""".stripMargin
+        // format: on
+      )
+      system.scheduler.scheduleOnce(durationToSleep)(bookReservationWorkflow())
+    }
   }
 }
