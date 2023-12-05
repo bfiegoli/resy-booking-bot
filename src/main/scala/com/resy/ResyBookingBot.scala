@@ -8,6 +8,8 @@ import play.api.libs.json._
 import pureconfig._
 import pureconfig.generic.auto._
 
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, TimeoutException}
@@ -66,10 +68,13 @@ object ResyBookingBot extends App with StrictLogging {
       val durationToSleep: FiniteDuration =
         config.secondsToBookingWindowStart(leadTime) - config.wakeAdjustment
       logger.info(
-        s"Booking window is $leadTime - bringing us to: ${config.bookingWindowStart(leadTime)}"
-      )
-      logger.info(
-        s"Sleeping for ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}"
+        // format: off
+        s"""
+           |  Booking window is $leadTime available at ${config.venue.hourOfDayToStartBooking} ${config.venue.timeZone.getDisplayName}
+           |  For the current booking, we will wake ${config.wakeAdjustment} before ${config.bookingWindowStart(leadTime)}
+           |  Local time is currently                                ${ZonedDateTime.now().truncatedTo(ChronoUnit.MINUTES)}
+           |  Calculated sleep period of ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}""".stripMargin
+        // format: on
       )
       system.scheduler.scheduleOnce(durationToSleep)(bookReservationWorkflow())
     }
