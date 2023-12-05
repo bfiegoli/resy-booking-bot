@@ -10,7 +10,13 @@ ThisBuild / scalafixDependencies ++= Seq(
 
 ThisBuild / dynverSeparator := "-"
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / publishTo := Some("Github Maven" at s"https://maven.pkg.github.com/nugs/$name")
+ThisBuild / publishTo := Some("Github Maven" at "https://maven.pkg.github.com/nugs/")
+ThisBuild / publishTo / credentials += Credentials(
+  "Github Maven",
+  "https://maven.pkg.github.com",
+  "nugs",
+  sys.env("repo-token")
+)
 
 lazy val root = Project("resy-booking-bot", file("."))
   .settings(

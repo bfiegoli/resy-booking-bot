@@ -24,3 +24,5 @@ jobs:
 
       - name: Create Release
         run: auto shipit
+        env:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
