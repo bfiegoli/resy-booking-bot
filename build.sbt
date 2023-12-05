@@ -10,9 +10,9 @@ ThisBuild / scalafixDependencies ++= Seq(
 
 ThisBuild / dynverSeparator := "-"
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / publishTo := Some("Github Maven" at "https://maven.pkg.github.com/nugs/")
+ThisBuild / publishTo := Some("GitHub Package Registry" at "https://maven.pkg.github.com/nugs/")
 ThisBuild / publishTo / credentials += Credentials(
-  "Github Maven",
+  "GitHub Package Registry",
   "https://maven.pkg.github.com",
   "nugs",
   sys.env("repo-token")
