@@ -13,7 +13,7 @@ ThisBuild / dynverSonatypeSnapshots := true
 ThisBuild / publishTo := Some("GitHub Package Registry" at "https://maven.pkg.github.com/nugs/")
 ThisBuild / publishTo / credentials += Credentials(
   "GitHub Package Registry",
-  "https://maven.pkg.github.com",
+  "maven.pkg.github.com",
   "nugs",
   sys.env("repo-token")
 )
