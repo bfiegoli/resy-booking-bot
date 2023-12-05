@@ -10,13 +10,10 @@ ThisBuild / scalafixDependencies ++= Seq(
 
 ThisBuild / dynverSeparator := "-"
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / publishTo := Some("GitHub Package Registry" at "https://maven.pkg.github.com/nugs/")
-ThisBuild / publishTo / credentials += Credentials(
-  "GitHub Package Registry",
-  "maven.pkg.github.com",
-  "nugs",
-  sys.env("repo-token")
-)
+ThisBuild / githubOwner := "Nugs"
+ThisBuild / githubRepository := name.value
+(ThisBuild / githubTokenSource).withRank(KeyRanks.Invisible) :=
+  TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token")
 
 lazy val root = Project("resy-booking-bot", file("."))
   .settings(

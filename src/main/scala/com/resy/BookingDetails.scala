@@ -12,7 +12,7 @@ final case class Venue(
   advance: FiniteDuration = 7.days,
   diningTypes: List[String] = List.empty,
   info: Option[String] = None,
-  timeZone: TimeZone = TimeZone.getTimeZone("EST")
+  timeZone: TimeZone = TimeZone.getTimeZone("America/New_York")
 )
 
 final case class Preference(
