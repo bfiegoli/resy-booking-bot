@@ -1,9 +1,8 @@
 package com.resy
 
-import akka.actor.ActorSystem
-import com.resy.BookReservationWorkflow._
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.lang3.time.DurationFormatUtils
+import org.apache.pekko.actor.ActorSystem
 import play.api.libs.json._
 import pureconfig._
 import pureconfig.generic.auto._
@@ -24,13 +23,15 @@ object ResyBookingBot extends App with StrictLogging {
 
   private val system = ActorSystem()
 
+  private val workflow = BookReservationWorkflow(config)
+
   private def bookReservationWorkflow(): Unit = {
     logger.info(s"Attempting to snipe reservation")
 
     val result: Future[Option[String]] = for {
-      findResResp    <- retryFindReservation
-      resDetailsResp <- getReservationDetails(findResResp)
-      bookResResp    <- bookReservation(resDetailsResp)
+      findResResp    <- workflow.retryFindReservation
+      resDetailsResp <- workflow.getReservationDetails(findResResp)
+      bookResResp    <- workflow.bookReservation(resDetailsResp)
     } yield {
       val bookDetails = Json.parse(bookResResp)
       logger.info(s"Booking Response: $bookDetails")
@@ -60,7 +61,7 @@ object ResyBookingBot extends App with StrictLogging {
     System.exit(0)
   }
 
-  getLeadTime().map { leadTime =>
+  workflow.getLeadTime.map { leadTime =>
     if (config.inBookingWindow(leadTime)) {
       logger.info("Within booking window for venue - attempting immediate reservation")
       bookReservationWorkflow()
@@ -76,6 +77,7 @@ object ResyBookingBot extends App with StrictLogging {
            |  Calculated sleep period of ${DurationFormatUtils.formatDuration(durationToSleep.toMillis, "d' days 'HH:mm:ss")}""".stripMargin
         // format: on
       )
+
       system.scheduler.scheduleOnce(durationToSleep)(bookReservationWorkflow())
     }
   }
