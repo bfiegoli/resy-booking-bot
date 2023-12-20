@@ -78,6 +78,7 @@ class BookReservationWorkflow(apiClient: ResyApiWrapper)(implicit bookingDetails
                |  Resy says: $leadTime
                |  Config says: ${bookingDetails.venue.advance}""".stripMargin
           )
+        case _ => ()
       }
     }
   }
