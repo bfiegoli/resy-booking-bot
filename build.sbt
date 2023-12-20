@@ -9,14 +9,19 @@ ThisBuild / scalafixDependencies ++= Seq(
   "com.eed3si9n.fix"    %% "scalafix-noinfer" % "0.1.0-M1"
 )
 
+val enableGithubPackages = sys.env.contains("GITHUB_TOKEN")
+
 ThisBuild / dynverSeparator := "-"
 ThisBuild / dynverSonatypeSnapshots := true
 ThisBuild / githubOwner := sys.env.getOrElse("GITHUB_REPOSITORY_OWNER", "n/a")
 ThisBuild / githubRepository := name.value
 (ThisBuild / githubTokenSource).withRank(KeyRanks.Invisible) :=
-  TokenSource.Environment("GITHUB_TOKEN") || TokenSource.GitConfig("github.token")
+  TokenSource.Environment("GITHUB_TOKEN")
 
 lazy val root = Project("resy-booking-bot", file("."))
+  .disablePlugins(
+    (if (enableGithubPackages) Seq.empty[AutoPlugin] else Seq(GitHubPackagesPlugin)) *
+  )
   .settings(
     scalafixOnCompile := true,
     scalafmtOnCompile := true,

@@ -45,6 +45,16 @@ class BookReservationWorkflowTest extends AsyncWordSpec with Matchers with Event
   private val mockApi: ResyApiWrapper = mock(classOf[ResyApiWrapper])
   private val underTest               = new BookReservationWorkflow(mockApi)(details)
 
+  "testGetLeadTime should invoke the API" in {
+    val leadTime = 10.days
+    when(mockApi.execute(eql(ApiDetails.Config), any[Map[String, String]])(any[BookingDetails]))
+      .thenReturn(Future.successful(s"""{"lead_time_in_days": ${leadTime.toDays}}"""))
+
+    eventually {
+      underTest.getLeadTime.map(_ shouldBe leadTime)
+    }
+  }
+
   "testGetLeadTime should invoke the API and use the value from the API over config" in {
     val leadTime = 5.days
     when(mockApi.execute(eql(ApiDetails.Config), any[Map[String, String]])(any[BookingDetails]))
