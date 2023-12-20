@@ -9,48 +9,42 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.chaining.scalaUtilChainingOps
 
-class BookReservationWorkflow(apiClient: ResyApiWrapper) extends StrictLogging {
+class BookReservationWorkflow(apiClient: ResyApiWrapper)(implicit bookingDetails: BookingDetails)
+    extends StrictLogging {
 
-  def getReservationDetails(
-    configId: String
-  )(implicit bookingDetails: BookingDetails): Future[String] = {
-    val findResQueryParams = Map(
+  def getReservationDetails(configId: String): Future[String] = {
+    Map(
       "config_id"  -> configId,
       "day"        -> bookingDetails.day,
-      "party_size" -> bookingDetails.partySize
+      "party_size" -> s"${bookingDetails.partySize}"
     )
-
-    apiClient.execute(ApiDetails.ReservationDetails, findResQueryParams)
+      .pipe(apiClient.execute(ApiDetails.ReservationDetails, _))
   }
 
-  def bookReservation(
-    resDetailsResp: String
-  )(implicit bookingDetails: BookingDetails): Future[String] = {
-    val resDetails = Json.parse(resDetailsResp)
-    logger.info(s"URL Response: $resDetailsResp")
+  def bookReservation(resDetailsResp: String): Future[String] = {
+    Json
+      .parse(resDetailsResp)
+      .tap(r => logger.info(s"URL Response: $r"))
+      .pipe { resDetails =>
+        val paymentMethodId: Option[(String, String)] =
+          (resDetails \ "user" \ "payment_methods" \ 0 \ "id").toOption
+            .map(v => "struct_payment_method" -> s"""{"id":${v.toString()}}""")
+            .tap(pid => logger.info(s"Payment Method Id: ${pid.map(_._2)}"))
 
-    val paymentMethodId: Option[(String, String)] =
-      (resDetails \ "user" \ "payment_methods" \ 0 \ "id").toOption.map { v =>
-        "struct_payment_method" -> s"""{"id":${v.toString()}}"""
+        val bookToken: String =
+          (resDetails \ "book_token" \ "value").get.toString
+            .replaceAll("\"", "")
+            .tap(token => logger.info(s"Book Token: $token"))
+
+        Map(
+          "book_token" -> bookToken,
+          "source_id"  -> "resy.com-venue-details"
+        ) ++ paymentMethodId.toSeq
       }
-
-    logger.info(s"Payment Method Id: $paymentMethodId")
-
-    val bookToken =
-      (resDetails \ "book_token" \ "value").get.toString
-        .replaceAll("\"", "")
-
-    logger.info(s"Book Token: $bookToken")
-
-    val bookResQueryParams = Map(
-      "book_token" -> bookToken,
-      "source_id"  -> "resy.com-venue-details"
-    ) ++ paymentMethodId.toSeq
-
-    apiClient.execute(ApiDetails.BookReservation, bookResQueryParams)
+      .pipe(apiClient.execute(ApiDetails.BookReservation, _))
   }
 
-  def retryFindReservation()(implicit bookingDetails: BookingDetails): Future[String] = {
+  def retryFindReservation: Future[String] = {
     findReservation
       .map { findResResp =>
         logger.info(s"Find Reservation Response: $findResResp")
@@ -63,14 +57,12 @@ class BookReservationWorkflow(apiClient: ResyApiWrapper) extends StrictLogging {
       }
       .flatMap {
         case Some(result) => Future.successful(result)
-        case None         => retryFindReservation()
+        case None         => retryFindReservation
       }
-      .recoverWith { _ =>
-        retryFindReservation()
-      }
+      .recoverWith(_ => retryFindReservation)
   }
 
-  def getLeadTime()(implicit bookingDetails: BookingDetails): Future[FiniteDuration] = {
+  def getLeadTime: Future[FiniteDuration] = {
     for {
       venueDetails <- apiClient.execute(
         ApiDetails.Config,
@@ -78,51 +70,54 @@ class BookReservationWorkflow(apiClient: ResyApiWrapper) extends StrictLogging {
       )
       lt <- Future.successful((Json.parse(venueDetails) \ "lead_time_in_days").as[Int].days)
     } yield {
-      lt.tap { leadTime =>
-        if (leadTime != bookingDetails.venue.advance) {
+      lt.tap {
+        case leadTime if leadTime != bookingDetails.venue.advance =>
           logger.warn(
             s"""Please be aware - the venue's lead time for bookings differs to the local configuration!
                |  You probably want to review when you start trying to book?
                |  Resy says: $leadTime
                |  Config says: ${bookingDetails.venue.advance}""".stripMargin
           )
-        }
       }
     }
   }
 
-  private[this] def findReservation()(implicit bookingDetails: BookingDetails): Future[String] = {
-    logger.info("Attempting to find reservation slot")
-
-    val findResQueryParams = Map(
+  private[this] def findReservation: Future[String] = {
+    Map(
       "day"        -> bookingDetails.day,
       "lat"        -> "0",
       "long"       -> "0",
-      "party_size" -> bookingDetails.partySize,
+      "party_size" -> s"${bookingDetails.partySize}",
       "venue_id"   -> bookingDetails.venue.id
     )
-
-    apiClient.execute(ApiDetails.FindReservation, findResQueryParams)
+      .tap(_ => logger.info("Attempting to find reservation slot"))
+      .pipe(apiClient.execute(ApiDetails.FindReservation, _))
   }
 
-  private[this] def findReservationTime(
-    reservationTimes: Seq[JsValue]
-  )(implicit bookingDetails: BookingDetails): Option[String] = {
+  private[this] def findReservationTime(reservationTimes: Seq[JsValue]): Option[String] = {
     reservationTimes
-      .tap(_ => logger.info("Attempting to find reservation time from prefs"))
+      .tap(_ => logger.info("Attempting to find reservation time from preferences"))
       .map { v =>
-        Slot(
+        new Slot(
           (v \ "date" \ "start").as[LocalDateTime],
           (v \ "config" \ "type").asOpt[String],
           (v \ "config" \ "token").asOpt[String]
         )
       }
       .tap(listBookingTypes)
-      .filter(s =>
-        bookingDetails.preferences.contains(s.asPreference) || bookingDetails.preferences.contains(
-          s.asPreference.copy(diningType = None)
-        )
-      )
+      .pipe { slots =>
+        bookingDetails.preferences
+          .find {
+            case Preference(time, None) => slots.exists(s => s.time == time)
+            case Preference(time, diningType) =>
+              slots.exists(s => s.time == time && s.diningType == diningType)
+          }
+          .flatMap {
+            case Preference(time, None) => slots.find(s => s.time == time)
+            case Preference(time, diningType) =>
+              slots.find(s => s.time == time && s.diningType == diningType)
+          }
+      }
       .map(_.token)
       .head
       .tap(v => logger.info(s"Config Id: $v"))
@@ -135,4 +130,8 @@ class BookReservationWorkflow(apiClient: ResyApiWrapper) extends StrictLogging {
   }
 }
 
-object BookReservationWorkflow extends BookReservationWorkflow(ResyApiWrapper)
+object BookReservationWorkflow {
+
+  def apply(bookingDetails: BookingDetails): BookReservationWorkflow =
+    new BookReservationWorkflow(ResyApiWrapper)(bookingDetails)
+}
