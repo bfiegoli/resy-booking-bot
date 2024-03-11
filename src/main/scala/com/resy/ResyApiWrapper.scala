@@ -21,6 +21,8 @@ class ResyApiWrapper extends StrictLogging {
       "Authorization"     -> s"""ResyAPI api_key="${details.apiKey}"""",
       "user-agent"        -> s"Mozilla/5.0 ${UUID.randomUUID().toString}",
       "dnt"               -> "1",
+      "accept"            -> "application/json, text/plain",
+      "cache-control"     -> "no-cache",
       "X-Resy-Auth-Token" -> details.authToken,
       "referer"           -> "https://widgets.resy.com/",
       "origin"            -> "https://widgets.resy.com/"
