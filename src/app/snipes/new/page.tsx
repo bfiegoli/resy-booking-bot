@@ -293,11 +293,20 @@ export default function NewSnipePage() {
                 {loadingConfig ? (
                   <div className="text-xs text-zinc-600 mt-1.5 animate-pulse">Fetching booking window...</div>
                 ) : leadTime != null ? (
-                  <div className="text-xs text-zinc-500 mt-1.5">
-                    <E>📅</E> Books <span className="text-zinc-300">{leadTime} days</span> ahead
-                    {selectedVenue && (
-                      <span> · Opens at <span className="text-zinc-300">{selectedVenue.booking_hour}:00</span> {formatTz(selectedVenue.time_zone)}</span>
-                    )}
+                  <div className="text-xs text-zinc-500 mt-1.5 space-y-0.5">
+                    <div>
+                      <E>📅</E> Books <span className="text-zinc-300">{leadTime} days</span> ahead
+                      {selectedVenue && (
+                        <span> · Opens at <span className="text-zinc-300">{selectedVenue.booking_hour}:00</span> {formatTz(selectedVenue.time_zone)}</span>
+                      )}
+                    </div>
+                    <div className="text-zinc-400">
+                      Next date to open: <span className="text-zinc-200 font-medium">{(() => {
+                        const d = new Date();
+                        d.setDate(d.getDate() + leadTime);
+                        return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+                      })()}</span>
+                    </div>
                   </div>
                 ) : null}
               </div>
