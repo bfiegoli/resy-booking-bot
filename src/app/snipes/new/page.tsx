@@ -64,6 +64,7 @@ export default function NewSnipePage() {
 
   const [leadTime, setLeadTime] = useState<number | null>(null);
   const [loadingConfig, setLoadingConfig] = useState(false);
+  const [knownDiningTypes, setKnownDiningTypes] = useState<string[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -113,10 +114,17 @@ export default function NewSnipePage() {
 
     if (saved.venue && accountId) {
       setLoadingConfig(true);
-      const configRes = await fetch(`/api/venues/${saved.venue.id}/config`);
+      const [configRes, dtRes] = await Promise.all([
+        fetch(`/api/venues/${saved.venue.id}/config`),
+        fetch(`/api/venues/${saved.venue.id}/dining-types`),
+      ]);
       if (configRes.ok) {
         const config = await configRes.json();
         setLeadTime(config.lead_time_days);
+      }
+      if (dtRes.ok) {
+        const dt = await dtRes.json();
+        setKnownDiningTypes(dt.dining_types ?? []);
       }
       setLoadingConfig(false);
     }
@@ -311,7 +319,7 @@ export default function NewSnipePage() {
                 ) : null}
               </div>
               <button
-                onClick={() => { setSelectedVenue(null); setSelectedVenueDisplay(null); setLeadTime(null); }}
+                onClick={() => { setSelectedVenue(null); setSelectedVenueDisplay(null); setLeadTime(null); setKnownDiningTypes([]); }}
                 className="self-start m-3 text-zinc-600 hover:text-zinc-300 text-xs px-2 py-1 hover:bg-white/5 rounded transition-all"
               >
                 Change
@@ -490,33 +498,48 @@ export default function NewSnipePage() {
         <Field label="Time Preferences" icon="⏰" hint="Ranked by priority — #1 is tried first">
           <div className="space-y-2">
             {preferences.map((pref, i) => (
-              <div key={i} className="flex items-center gap-2 animate-slide-up" style={{ animationDelay: `${i * 30}ms` }}>
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                  i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-zinc-800 text-zinc-500 border border-zinc-700"
-                }`}>
-                  {i + 1}
-                </span>
-                <input
-                  type="time"
-                  value={pref.time}
-                  onChange={(e) => updatePreference(i, "time", e.target.value)}
-                  className="input w-[140px]"
-                />
-                <input
-                  type="text"
-                  placeholder="Dining type (optional)"
-                  value={pref.dining_type}
-                  onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
-                  className="input flex-1"
-                />
-                {preferences.length > 1 && (
-                  <button
-                    onClick={() => removePreference(i)}
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
-                  >
-                    ×
-                  </button>
-                )}
+              <div key={i} className="animate-slide-up" style={{ animationDelay: `${i * 30}ms` }}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                    i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-zinc-800 text-zinc-500 border border-zinc-700"
+                  }`}>
+                    {i + 1}
+                  </span>
+                  <input
+                    type="time"
+                    value={pref.time}
+                    onChange={(e) => updatePreference(i, "time", e.target.value)}
+                    className="input w-[140px]"
+                  />
+                  {knownDiningTypes.length > 0 ? (
+                    <select
+                      value={pref.dining_type}
+                      onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
+                      className="input flex-1"
+                    >
+                      <option value="">Any type</option>
+                      {knownDiningTypes.map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder="Dining type (optional)"
+                      value={pref.dining_type}
+                      onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
+                      className="input flex-1"
+                    />
+                  )}
+                  {preferences.length > 1 && (
+                    <button
+                      onClick={() => removePreference(i)}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
             <button
@@ -526,6 +549,11 @@ export default function NewSnipePage() {
               + Add fallback time
             </button>
           </div>
+          {knownDiningTypes.length > 0 && (
+            <div className="text-[11px] text-zinc-600 mt-2">
+              Known types from past runs: {knownDiningTypes.join(", ")}
+            </div>
+          )}
         </Field>
       )}
 
