@@ -37,9 +37,9 @@ export async function GET(
   const apiKey = process.env.RESY_API_KEY!;
   const authToken = decrypt(account.auth_token);
 
-  // Try today + next few days to find any available slots
+  // Try past 7 days — future dates likely haven't opened yet
   const today = new Date();
-  for (let offset = 0; offset <= 7; offset++) {
+  for (let offset = 0; offset >= -7; offset--) {
     const d = new Date(today);
     d.setDate(d.getDate() + offset);
     const dateStr = d.toISOString().slice(0, 10);
