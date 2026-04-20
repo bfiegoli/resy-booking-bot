@@ -511,26 +511,31 @@ export default function NewSnipePage() {
                     onChange={(e) => updatePreference(i, "time", e.target.value)}
                     className="input w-[140px]"
                   />
-                  {knownDiningTypes.length > 0 ? (
-                    <select
-                      value={pref.dining_type}
-                      onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
-                      className="input flex-1"
-                    >
-                      <option value="">Any type</option>
-                      {knownDiningTypes.map((t) => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
-                    </select>
-                  ) : (
+                  <div className="flex-1 flex items-center gap-1.5">
                     <input
                       type="text"
-                      placeholder="Dining type (optional)"
+                      list={`dining-types-${i}`}
+                      placeholder={knownDiningTypes.length > 0 ? "Select or type..." : "Dining type (optional)"}
                       value={pref.dining_type}
                       onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
                       className="input flex-1"
                     />
-                  )}
+                    {knownDiningTypes.length > 0 && (
+                      <datalist id={`dining-types-${i}`}>
+                        {knownDiningTypes.map((t) => (
+                          <option key={t} value={t} />
+                        ))}
+                      </datalist>
+                    )}
+                    {pref.dining_type && (
+                      <button
+                        onClick={() => updatePreference(i, "dining_type", "")}
+                        className="text-zinc-600 hover:text-zinc-400 text-xs shrink-0"
+                      >
+                        clear
+                      </button>
+                    )}
+                  </div>
                   {preferences.length > 1 && (
                     <button
                       onClick={() => removePreference(i)}
@@ -550,8 +555,11 @@ export default function NewSnipePage() {
             </button>
           </div>
           {knownDiningTypes.length > 0 && (
-            <div className="text-[11px] text-zinc-600 mt-2">
-              Known types from past runs: {knownDiningTypes.join(", ")}
+            <div className="flex flex-wrap items-center gap-1.5 mt-3">
+              <span className="text-[11px] text-zinc-600">Known types:</span>
+              {knownDiningTypes.map((t) => (
+                <span key={t} className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-zinc-700/50 text-zinc-400">{t}</span>
+              ))}
             </div>
           )}
         </Field>
