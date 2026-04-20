@@ -558,7 +558,17 @@ export default function NewSnipePage() {
             <div className="flex flex-wrap items-center gap-1.5 mt-3">
               <span className="text-[11px] text-zinc-600">Known types:</span>
               {knownDiningTypes.map((t) => (
-                <span key={t} className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-zinc-700/50 text-zinc-400">{t}</span>
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    const idx = preferences.findIndex((p) => !p.dining_type);
+                    if (idx >= 0) updatePreference(idx, "dining_type", t);
+                  }}
+                  className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-zinc-700/50 text-zinc-400 hover:text-white hover:border-zinc-500 hover:bg-white/10 transition-all cursor-pointer"
+                >
+                  {t}
+                </button>
               ))}
             </div>
           )}
