@@ -243,6 +243,13 @@ export default function NewSnipePage() {
       </div>
 
       {/* Account Selection */}
+      {accounts.length === 1 && (
+        <div className="flex items-center gap-2 text-sm text-zinc-400">
+          <span className="text-xs">👤</span>
+          Booking as <span className="text-zinc-200 font-medium">{accounts[0].first_name ?? accounts[0].email}</span>
+          <span className="text-zinc-600">({accounts[0].email})</span>
+        </div>
+      )}
       {accounts.length > 1 && (
         <Field label="Account" icon="👤">
           <select
