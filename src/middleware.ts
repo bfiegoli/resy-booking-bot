@@ -7,7 +7,7 @@ export function middleware(req: NextRequest) {
   if (!PASSWORD) return NextResponse.next();
 
   const { pathname } = req.nextUrl;
-  if (pathname === "/login" || pathname === "/api/login" || pathname.startsWith("/_next") || pathname.startsWith("/favicon")) {
+  if (pathname === "/login" || pathname === "/api/login" || pathname.startsWith("/_next") || pathname.startsWith("/favicon") || pathname.includes("opengraph-image")) {
     return NextResponse.next();
   }
 
