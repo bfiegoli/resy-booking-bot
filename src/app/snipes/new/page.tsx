@@ -184,7 +184,7 @@ export default function NewSnipePage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setSubmitting(false); setError(data.error ?? `Failed to create snipe for ${d}`); return; }
+      if (!res.ok) { setSubmitting(false); setError(data.error ?? `Failed to create booking for ${d}`); return; }
       results.push({ id: data.snipe.id });
     }
 
@@ -209,12 +209,12 @@ export default function NewSnipePage() {
     <div className="max-w-2xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          {mode === "research" ? "New Research" : "New Snipe"}
+          {mode === "research" ? "New Research" : "New Booking"}
         </h1>
         <p className="text-zinc-500 text-sm mt-1">
           {mode === "research"
             ? "Observe what slots release at the booking window"
-            : "Set up an automated reservation grab"}
+            : "Set up an automated reservation booking"}
         </p>
       </div>
 
@@ -228,7 +228,7 @@ export default function NewSnipePage() {
               : "text-zinc-500 hover:text-zinc-300"
           }`}
         >
-          <E>🔫</E> Book
+          <E>🍽️</E> Book
         </button>
         <button
           onClick={() => setMode("research")}
@@ -400,7 +400,7 @@ export default function NewSnipePage() {
       {/* Dates + Party Size */}
       {mode === "book" ? (
         <div className="grid grid-cols-[1fr_160px] gap-4">
-          <Field label={`Dates${dates.length > 0 ? ` (${dates.length})` : ""}`} icon="📅" hint="Pick multiple — each becomes its own snipe">
+          <Field label={`Dates${dates.length > 0 ? ` (${dates.length})` : ""}`} icon="📅" hint="Pick multiple — each becomes its own booking">
             <div className="flex items-center gap-2">
               <input
                 type="date"
@@ -492,8 +492,8 @@ export default function NewSnipePage() {
               <div className="text-xs text-zinc-500">
                 {mode === "research"
                   ? `Will observe for ${retryTimeout}s starting at each window open`
-                  : `The sniper will wake up ${wakeAdjustment}ms early and start hammering the API`}
-                {dates.length > 1 && ` · ${dates.length} snipes will be created`}
+                  : `The bot will wake up ${wakeAdjustment}ms early and start requesting slots`}
+                {dates.length > 1 && ` · ${dates.length} bookings will be created`}
               </div>
             </div>
           </div>
@@ -666,12 +666,12 @@ export default function NewSnipePage() {
         {submitting ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            {mode === "research" ? "Starting..." : "Arming..."} ({dates.length})
+            {mode === "research" ? "Starting..." : "Scheduling..."} ({dates.length})
           </span>
         ) : mode === "research" ? (
           <><E>🔬</E> {demo ? "Run Demo Research" : "Start Research"}{dates.length > 1 ? ` (${dates.length} dates)` : ""}</>
         ) : (
-          <><E>🔫</E> {demo ? "Run Demo Snipe" : "Arm Snipe"}{dates.length > 1 ? ` (${dates.length} dates)` : ""}</>
+          <><E>🍽️</E> {demo ? "Run Demo Booking" : "Schedule Booking"}{dates.length > 1 ? ` (${dates.length} dates)` : ""}</>
         )}
       </button>
     </div>
