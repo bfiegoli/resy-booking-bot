@@ -498,7 +498,7 @@ export default function NewSnipePage() {
         <Field label="Time Preferences" icon="⏰" hint="Ranked by priority — #1 is tried first">
           <div className="space-y-2">
             {preferences.map((pref, i) => (
-              <div key={i} className="animate-slide-up" style={{ animationDelay: `${i * 30}ms` }}>
+              <div key={i} className="animate-slide-up space-y-1.5" style={{ animationDelay: `${i * 30}ms` }}>
                 <div className="flex items-center gap-2">
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                     i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-zinc-800 text-zinc-500 border border-zinc-700"
@@ -511,31 +511,22 @@ export default function NewSnipePage() {
                     onChange={(e) => updatePreference(i, "time", e.target.value)}
                     className="input w-[140px]"
                   />
-                  <div className="flex-1 flex items-center gap-1.5">
-                    <input
-                      type="text"
-                      list={`dining-types-${i}`}
-                      placeholder={knownDiningTypes.length > 0 ? "Select or type..." : "Dining type (optional)"}
-                      value={pref.dining_type}
-                      onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
-                      className="input flex-1"
-                    />
-                    {knownDiningTypes.length > 0 && (
-                      <datalist id={`dining-types-${i}`}>
-                        {knownDiningTypes.map((t) => (
-                          <option key={t} value={t} />
-                        ))}
-                      </datalist>
-                    )}
-                    {pref.dining_type && (
-                      <button
-                        onClick={() => updatePreference(i, "dining_type", "")}
-                        className="text-zinc-600 hover:text-zinc-400 text-xs shrink-0"
-                      >
-                        clear
-                      </button>
-                    )}
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="Dining type (optional)"
+                    value={pref.dining_type}
+                    onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
+                    className="input flex-1"
+                  />
+                  {pref.dining_type && (
+                    <button
+                      type="button"
+                      onClick={() => updatePreference(i, "dining_type", "")}
+                      className="text-zinc-600 hover:text-zinc-400 text-xs shrink-0"
+                    >
+                      clear
+                    </button>
+                  )}
                   {preferences.length > 1 && (
                     <button
                       onClick={() => removePreference(i)}
@@ -545,6 +536,24 @@ export default function NewSnipePage() {
                     </button>
                   )}
                 </div>
+                {knownDiningTypes.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 ml-8">
+                    {knownDiningTypes.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => updatePreference(i, "dining_type", t)}
+                        className={`text-[11px] px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+                          pref.dining_type === t
+                            ? "bg-white/10 border-zinc-500 text-white"
+                            : "bg-white/5 border-zinc-700/50 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
             <button
@@ -554,24 +563,6 @@ export default function NewSnipePage() {
               + Add fallback time
             </button>
           </div>
-          {knownDiningTypes.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 mt-3">
-              <span className="text-[11px] text-zinc-600">Known types:</span>
-              {knownDiningTypes.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => {
-                    const idx = preferences.findIndex((p) => !p.dining_type);
-                    if (idx >= 0) updatePreference(idx, "dining_type", t);
-                  }}
-                  className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-zinc-700/50 text-zinc-400 hover:text-white hover:border-zinc-500 hover:bg-white/10 transition-all cursor-pointer"
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          )}
         </Field>
       )}
 
