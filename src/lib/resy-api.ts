@@ -136,8 +136,13 @@ export type VenueSearchResponse = {
 export async function searchVenues(
   apiKey: string,
   query: string,
-  perPage = 10
+  perPage = 10,
+  geo?: { latitude: number; longitude: number }
 ): Promise<ApiCallResult<VenueSearchResponse>> {
+  const body: Record<string, unknown> = { query, per_page: perPage, types: ["venue"] };
+  if (geo) {
+    body.geo = { latitude: geo.latitude, longitude: geo.longitude };
+  }
   return apiCall<VenueSearchResponse>(
     `${BASE_URL}/3/venuesearch/search`,
     {
@@ -146,7 +151,7 @@ export async function searchVenues(
         ...authHeaders(apiKey),
         "content-type": "application/json",
       },
-      body: JSON.stringify({ query, per_page: perPage, types: ["venue"] }),
+      body: JSON.stringify(body),
     },
     "venuesearch/search"
   );

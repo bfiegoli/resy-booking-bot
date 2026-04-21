@@ -197,36 +197,36 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
   const errorCount = logs.filter((l) => l.level === "error").length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Back */}
-      <Link href="/" className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+      <Link href="/" className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-300 text-xs sm:text-sm transition-colors">
         ← Dashboard
       </Link>
 
       {/* Header Card */}
-      <div className={`glass rounded-2xl p-4 sm:p-6 ${snipe.status === "success" ? "glow-green" : snipe.status === "failed" ? "glow-red" : snipe.status === "running" ? "glow-purple" : ""}`}>
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div className={`glass rounded-xl sm:rounded-2xl p-3 sm:p-6 ${snipe.status === "success" ? "glow-green" : snipe.status === "failed" ? "glow-red" : snipe.status === "running" ? "glow-purple" : ""}`}>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
-              <span className="text-2xl"><E>{config.icon}</E></span>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">{snipe.venue_name}</h1>
-              <span className={`px-3 py-1 rounded-lg text-xs font-bold border uppercase tracking-wider ${config.bg} ${config.color} ${snipe.status === "running" ? "animate-pulse" : ""}`}>
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 mb-2 sm:mb-3">
+              <span className="text-lg sm:text-2xl"><E>{config.icon}</E></span>
+              <h1 className="text-base sm:text-2xl font-bold text-white">{snipe.venue_name}</h1>
+              <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold border uppercase tracking-wider ${config.bg} ${config.color} ${snipe.status === "running" ? "animate-pulse" : ""}`}>
                 {config.label}
               </span>
               {snipe.mode === "research" && (
-                <span className="px-3 py-1 rounded-lg text-xs font-bold border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 uppercase tracking-wider">
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold border bg-cyan-500/10 border-cyan-500/20 text-cyan-400 uppercase tracking-wider">
                   Research
                 </span>
               )}
               {snipe.demo === 1 && (
-                <span className="px-3 py-1 rounded-lg text-xs font-bold border bg-purple-500/10 border-purple-500/20 text-purple-400 uppercase tracking-wider">
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-bold border bg-purple-500/10 border-purple-500/20 text-purple-400 uppercase tracking-wider">
                   Demo
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm sm:ml-11">
+            <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-1 text-xs sm:text-sm ml-7 sm:ml-11">
               <span className="text-zinc-300 font-medium">
-                {new Date(snipe.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                {new Date(snipe.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
               </span>
               {snipe.mode === "book" && (
                 <>
@@ -240,27 +240,27 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
               )}
             </div>
             {snipe.booking_window_start && isActive && (
-              <div className="mt-4 sm:ml-11 glass rounded-lg px-3 sm:px-4 py-2.5 inline-flex flex-wrap items-center gap-2 sm:gap-3">
-                <span className="text-xs text-zinc-500">Booking window opens:</span>
-                <span className={`text-base sm:text-lg font-bold ${config.color}`}>
+              <div className="mt-3 sm:mt-4 ml-7 sm:ml-11 glass rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 inline-flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="text-[10px] sm:text-xs text-zinc-500">Opens in:</span>
+                <span className={`text-sm sm:text-lg font-bold ${config.color}`}>
                   <Countdown target={snipe.booking_window_start} />
                 </span>
               </div>
             )}
             {snipe.reservation_id && (
-              <div className="mt-4 sm:ml-11 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2.5 inline-flex items-center gap-2 glow-green">
-                <span className="text-green-400 font-semibold text-sm sm:text-base">Reservation #{snipe.reservation_id}</span>
+              <div className="mt-3 sm:mt-4 ml-7 sm:ml-11 bg-green-500/10 border border-green-500/20 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 inline-flex items-center gap-2 glow-green">
+                <span className="text-green-400 font-semibold text-xs sm:text-base">Reservation #{snipe.reservation_id}</span>
               </div>
             )}
           </div>
-          <div className="flex gap-2 shrink-0">
+          <div className="flex gap-1.5 sm:gap-2 shrink-0 ml-7 sm:ml-0">
             {isActive && snipe.status !== "running" && (
-              <button onClick={runNow} className="px-4 py-2 text-sm bg-purple-500/15 hover:bg-purple-500/25 text-purple-400 rounded-xl transition-all font-medium">
+              <button onClick={runNow} className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-purple-500/15 hover:bg-purple-500/25 text-purple-400 rounded-xl transition-all font-medium">
                 <E>⚡</E> Run Now
               </button>
             )}
             {isActive && (
-              <button onClick={cancelSnipe} className="px-4 py-2 text-sm bg-red-500/10 hover:bg-red-500/20 text-red-400/80 hover:text-red-400 rounded-xl transition-all font-medium">
+              <button onClick={cancelSnipe} className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-red-500/10 hover:bg-red-500/20 text-red-400/80 hover:text-red-400 rounded-xl transition-all font-medium">
                 Cancel
               </button>
             )}
@@ -281,9 +281,9 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                 { label: "Sweeps", value: summary.total_sweeps, color: "text-blue-400" },
                 { label: "Duration", value: `${(summary.duration_ms / 1000).toFixed(0)}s`, color: "text-zinc-300" },
               ].map((stat) => (
-                <div key={stat.label} className="glass rounded-xl p-4 text-center">
-                  <div className={`text-2xl font-bold tabular-nums ${stat.color}`}>{stat.value}</div>
-                  <div className="text-[11px] text-zinc-500 mt-1">{stat.label}</div>
+                <div key={stat.label} className="glass rounded-xl p-3 sm:p-4 text-center">
+                  <div className={`text-lg sm:text-2xl font-bold tabular-nums ${stat.color}`}>{stat.value}</div>
+                  <div className="text-[10px] sm:text-[11px] text-zinc-500 mt-0.5 sm:mt-1">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -410,10 +410,10 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Log Viewer — Terminal Style */}
       {logs.length === 0 ? (
-        <div className="glass rounded-2xl p-8 sm:p-16 text-center">
-          <div className="text-3xl mb-3"><E>📡</E></div>
-          <div className="text-zinc-400 font-medium">Waiting for signal...</div>
-          <div className="text-zinc-600 text-sm mt-1">Logs will stream here when the booking fires</div>
+        <div className="glass rounded-xl sm:rounded-2xl p-6 sm:p-16 text-center">
+          <div className="text-2xl sm:text-3xl mb-2 sm:mb-3"><E>📡</E></div>
+          <div className="text-zinc-400 text-sm font-medium">Waiting for signal...</div>
+          <div className="text-zinc-600 text-xs sm:text-sm mt-1">Logs will stream here when the booking fires</div>
         </div>
       ) : (
         <div className="bg-[#0a0a0c] border border-zinc-800/50 rounded-2xl overflow-hidden shadow-2xl">

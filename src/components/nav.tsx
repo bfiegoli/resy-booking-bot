@@ -32,11 +32,11 @@ export function Nav() {
 
   return (
     <nav className="border-b border-zinc-800/50 sticky top-0 z-50 glass">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 flex items-center h-14 justify-between">
-        <div className="flex items-center gap-3 sm:gap-8">
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <span className="text-2xl"><E>🍽️</E></span>
-            <span className="text-base sm:text-lg font-bold tracking-tight text-white group-hover:text-resy-red-light transition-colors hidden sm:inline">
+      <div className="max-w-6xl mx-auto px-2 sm:px-4 flex items-center h-12 sm:h-14 justify-between">
+        <div className="flex items-center gap-2 sm:gap-8">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
+            <span className="text-xl sm:text-2xl"><E>🍽️</E></span>
+            <span className="text-sm sm:text-lg font-bold tracking-tight text-white group-hover:text-resy-red-light transition-colors hidden sm:inline">
               Resy Bot 2.0
             </span>
             {activeCount > 0 && (
@@ -45,14 +45,14 @@ export function Nav() {
               </span>
             )}
           </Link>
-          <div className="flex gap-0.5 sm:gap-1">
+          <div className="flex">
             {links.map(({ href, label, icon }) => {
               const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5 ${
+                  className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1 sm:gap-1.5 ${
                     active
                       ? "bg-white/10 text-white"
                       : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"

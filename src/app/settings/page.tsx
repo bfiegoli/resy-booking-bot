@@ -61,10 +61,10 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-10">
+    <div className="max-w-2xl mx-auto space-y-6 sm:space-y-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-zinc-500 text-sm mt-1">Manage your Resy accounts and configuration</p>
+        <h1 className="text-xl sm:text-3xl font-bold tracking-tight"><E>⚙️</E> Settings</h1>
+        <p className="text-zinc-500 text-xs sm:text-sm mt-1">Manage your Resy accounts and configuration</p>
       </div>
 
       {/* Accounts */}
@@ -109,8 +109,8 @@ export default function SettingsPage() {
             ))}
           </div>
         ) : (
-          <div className="glass rounded-xl p-10 text-center">
-            <div className="text-3xl mb-3"><E>🔑</E></div>
+          <div className="glass rounded-xl p-6 sm:p-10 text-center">
+            <div className="text-2xl sm:text-3xl mb-3"><E>🔑</E></div>
             <div className="text-zinc-400 font-medium">No accounts connected</div>
             <div className="text-zinc-600 text-sm mt-1">Add your Resy login below to get started</div>
           </div>

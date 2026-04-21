@@ -306,15 +306,23 @@ function DashboardContent({
       {/* Empty active */}
       {active.length === 0 && (
         <div className="glass rounded-2xl p-6 sm:p-12 text-center anim-in" style={{ animationDelay: "400ms" }}>
-          <div className="text-3xl sm:text-5xl mb-3 animate-float"><E>🎯</E></div>
+          <div className="text-2xl sm:text-5xl mb-2 sm:mb-3 animate-float"><E>🎯</E></div>
           <div className="text-zinc-300 text-sm font-medium">No bookings queued</div>
-          <div className="text-zinc-500 text-xs mt-1 mb-5">Your next reservation is one click away</div>
-          <Link
-            href="/snipes/new"
-            className="inline-flex px-5 py-2.5 bg-white/10 hover:bg-white/15 text-white rounded-xl text-xs sm:text-sm font-medium transition-all"
-          >
-            New Booking →
-          </Link>
+          <div className="text-zinc-500 text-xs mt-1 mb-4 sm:mb-5">Your next reservation is one click away</div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+            <Link
+              href="/snipes/new"
+              className="inline-flex px-5 py-2.5 bg-white/10 hover:bg-white/15 text-white rounded-xl text-xs sm:text-sm font-medium transition-all"
+            >
+              New Booking →
+            </Link>
+            <Link
+              href="/discover"
+              className="inline-flex px-5 py-2.5 text-zinc-500 hover:text-zinc-300 text-xs sm:text-sm font-medium transition-all"
+            >
+              Discover Restaurants
+            </Link>
+          </div>
         </div>
       )}
 

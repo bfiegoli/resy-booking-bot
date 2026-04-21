@@ -8,23 +8,30 @@ type Urgency = "open" | "today" | "soon" | "upcoming" | "unknown";
 
 function getUrgency(opensAt: Date | null): Urgency {
   if (!opensAt) return "unknown";
-  const now = Date.now();
-  const diff = opensAt.getTime() - now;
-  if (diff <= 0) return "open";
-  if (diff <= 24 * 3600_000) return "today";
-  if (diff <= 2 * 24 * 3600_000) return "soon";
+  const now = new Date();
+  if (opensAt.getTime() <= now.getTime()) return "open";
+
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrowStart = new Date(todayStart.getTime() + 86400_000);
+  const dayAfterStart = new Date(todayStart.getTime() + 2 * 86400_000);
+
+  if (opensAt < tomorrowStart) return "today";
+  if (opensAt < dayAfterStart) return "soon";
   return "upcoming";
 }
 
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("q");
   const date = req.nextUrl.searchParams.get("date");
+  const lat = req.nextUrl.searchParams.get("lat");
+  const lng = req.nextUrl.searchParams.get("lng");
 
   if (!query) return NextResponse.json({ error: "Query parameter 'q' required" }, { status: 400 });
   if (!date) return NextResponse.json({ error: "Query parameter 'date' required" }, { status: 400 });
 
   const apiKey = process.env.RESY_API_KEY!;
-  const result = await searchVenues(apiKey, query, 15);
+  const geo = lat && lng ? { latitude: parseFloat(lat), longitude: parseFloat(lng) } : undefined;
+  const result = await searchVenues(apiKey, query, 15, geo);
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 502 });

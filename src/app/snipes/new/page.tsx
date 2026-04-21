@@ -240,12 +240,12 @@ function NewSnipePage() {
   const isReady = selectedVenue && accountId && dates.length > 0 && (mode === "research" || preferences.length > 0);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-2xl mx-auto space-y-5 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          {mode === "research" ? "New Research" : "New Booking"}
+        <h1 className="text-xl sm:text-3xl font-bold tracking-tight">
+          <E>{mode === "research" ? "🔬" : "🍽️"}</E> {mode === "research" ? "New Research" : "New Booking"}
         </h1>
-        <p className="text-zinc-500 text-sm mt-1">
+        <p className="text-zinc-500 text-xs sm:text-sm mt-1">
           {mode === "research"
             ? "Observe what slots release at the booking window"
             : "Set up an automated reservation booking"}
@@ -253,10 +253,10 @@ function NewSnipePage() {
       </div>
 
       {/* Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-zinc-900/50 rounded-xl w-fit">
+      <div className="flex gap-1.5 sm:gap-2 p-1 bg-zinc-900/50 rounded-xl w-fit">
         <button
           onClick={() => setMode("book")}
-          className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+          className={`px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 sm:gap-2 ${
             mode === "book"
               ? "bg-resy-red/20 text-resy-red-light border border-resy-red/30"
               : "text-zinc-500 hover:text-zinc-300"
@@ -266,7 +266,7 @@ function NewSnipePage() {
         </button>
         <button
           onClick={() => setMode("research")}
-          className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+          className={`px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 sm:gap-2 ${
             mode === "research"
               ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/25"
               : "text-zinc-500 hover:text-zinc-300"
@@ -324,9 +324,9 @@ function NewSnipePage() {
                   className="w-full h-32 sm:w-28 sm:h-28 object-cover shrink-0"
                 />
               )}
-              <div className="flex-1 p-4 flex flex-col justify-center min-w-0">
+              <div className="flex-1 p-3 sm:p-4 flex flex-col justify-center min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-white font-semibold text-base sm:text-lg">{selectedVenueDisplay.name}</span>
+                  <span className="text-white font-semibold text-sm sm:text-lg">{selectedVenueDisplay.name}</span>
                   {selectedVenueDisplay.rating_average > 0 && (
                     <span className="text-xs text-amber-400 font-medium">
                       ★ {selectedVenueDisplay.rating_average.toFixed(1)}
@@ -689,7 +689,7 @@ function NewSnipePage() {
       <button
         onClick={submit}
         disabled={submitting || !isReady}
-        className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
+        className={`w-full py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-lg transition-all ${
           isReady
             ? mode === "research"
               ? "bg-gradient-to-r from-cyan-600 to-cyan-500 hover:brightness-110 text-white shadow-lg shadow-cyan-500/20 cursor-pointer"
