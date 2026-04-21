@@ -2,7 +2,4 @@ node_modules/
 .next/
 .env.local
 *.db
-*.db-shm
-*.db-wal
 .DS_Store
-tsconfig.tsbuildinfo
