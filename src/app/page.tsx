@@ -193,8 +193,8 @@ export default function Dashboard() {
 
       {/* Empty State */}
       {active.length === 0 && accounts.length > 0 && (
-        <div className="glass rounded-2xl p-12 text-center">
-          <div className="text-5xl mb-4"><E>🎯</E></div>
+        <div className="glass rounded-2xl p-8 sm:p-12 text-center">
+          <div className="text-4xl sm:text-5xl mb-4"><E>🎯</E></div>
           <div className="text-zinc-300 font-medium">No bookings queued</div>
           <div className="text-zinc-500 text-sm mt-1 mb-6">
             Search for a restaurant and set up your first booking

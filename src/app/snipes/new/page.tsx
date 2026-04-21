@@ -327,7 +327,7 @@ export default function NewSnipePage() {
               </div>
               <button
                 onClick={() => { setSelectedVenue(null); setSelectedVenueDisplay(null); setLeadTime(null); setKnownDiningTypes([]); }}
-                className="self-start m-3 text-zinc-600 hover:text-zinc-300 text-xs px-2 py-1 hover:bg-white/5 rounded transition-all"
+                className="self-start sm:self-start mx-4 mb-3 sm:m-3 text-zinc-600 hover:text-zinc-300 text-xs px-2 py-1 hover:bg-white/5 rounded transition-all shrink-0"
               >
                 Change
               </button>

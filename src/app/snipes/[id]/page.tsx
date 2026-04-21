@@ -240,9 +240,9 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
               )}
             </div>
             {snipe.booking_window_start && isActive && (
-              <div className="mt-4 sm:ml-11 glass rounded-lg px-4 py-2.5 inline-flex items-center gap-3">
+              <div className="mt-4 sm:ml-11 glass rounded-lg px-3 sm:px-4 py-2.5 inline-flex flex-wrap items-center gap-2 sm:gap-3">
                 <span className="text-xs text-zinc-500">Booking window opens:</span>
-                <span className={`text-lg font-bold ${config.color}`}>
+                <span className={`text-base sm:text-lg font-bold ${config.color}`}>
                   <Countdown target={snipe.booking_window_start} />
                 </span>
               </div>
@@ -328,15 +328,15 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                   </h3>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-xs sm:text-sm">
                     <thead>
-                      <tr className="text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800/30">
-                        <th className="text-left px-5 py-2 font-medium">Time</th>
-                        <th className="text-left px-5 py-2 font-medium">Type</th>
-                        <th className="text-left px-5 py-2 font-medium">Seats</th>
-                        <th className="text-left px-5 py-2 font-medium">First Seen</th>
-                        <th className="text-left px-5 py-2 font-medium">Last Seen</th>
-                        <th className="text-left px-5 py-2 font-medium">Lifespan</th>
+                      <tr className="text-[10px] sm:text-[11px] text-zinc-500 uppercase tracking-wider border-b border-zinc-800/30">
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">Time</th>
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">Type</th>
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">Seats</th>
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">First Seen</th>
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">Last Seen</th>
+                        <th className="text-left px-3 sm:px-5 py-2 font-medium">Lifespan</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -347,12 +347,12 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                         const isFast = lifespan < 5000 && isPrime;
                         return (
                           <tr key={i} className={`border-b border-zinc-800/20 ${isFast ? "bg-red-500/[0.03]" : ""}`}>
-                            <td className="px-5 py-2 font-mono text-zinc-200 font-medium">{slot.time}</td>
-                            <td className="px-5 py-2 text-zinc-400">{slot.type}</td>
-                            <td className="px-5 py-2 text-zinc-400 tabular-nums">{slot.min_seats}–{slot.max_seats}</td>
-                            <td className="px-5 py-2 text-zinc-500 font-mono tabular-nums">+{(slot.first_seen_ms / 1000).toFixed(1)}s</td>
-                            <td className="px-5 py-2 text-zinc-500 font-mono tabular-nums">+{(slot.last_seen_ms / 1000).toFixed(1)}s</td>
-                            <td className={`px-5 py-2 font-mono tabular-nums ${isFast ? "text-red-400 font-medium" : lifespan < 30000 ? "text-amber-400" : "text-green-400"}`}>
+                            <td className="px-3 sm:px-5 py-2 font-mono text-zinc-200 font-medium whitespace-nowrap">{slot.time}</td>
+                            <td className="px-3 sm:px-5 py-2 text-zinc-400 whitespace-nowrap">{slot.type}</td>
+                            <td className="px-3 sm:px-5 py-2 text-zinc-400 tabular-nums whitespace-nowrap">{slot.min_seats}–{slot.max_seats}</td>
+                            <td className="px-3 sm:px-5 py-2 text-zinc-500 font-mono tabular-nums whitespace-nowrap">+{(slot.first_seen_ms / 1000).toFixed(1)}s</td>
+                            <td className="px-3 sm:px-5 py-2 text-zinc-500 font-mono tabular-nums whitespace-nowrap">+{(slot.last_seen_ms / 1000).toFixed(1)}s</td>
+                            <td className={`px-3 sm:px-5 py-2 font-mono tabular-nums whitespace-nowrap ${isFast ? "text-red-400 font-medium" : lifespan < 30000 ? "text-amber-400" : "text-green-400"}`}>
                               {lifespanLabel}
                               {isFast && <span className="ml-1.5 text-[10px] text-red-400/70">FAST</span>}
                             </td>
@@ -381,8 +381,8 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
             </span>
           )}
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex flex-wrap gap-1 bg-zinc-900/50 rounded-lg p-0.5">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap gap-1 bg-zinc-900/50 rounded-lg p-0.5 max-w-full">
             {[
               { key: "all", label: "All" },
               { key: "errors", label: `Errors${errorCount > 0 ? ` (${errorCount})` : ""}` },
@@ -410,7 +410,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Log Viewer — Terminal Style */}
       {logs.length === 0 ? (
-        <div className="glass rounded-2xl p-16 text-center">
+        <div className="glass rounded-2xl p-8 sm:p-16 text-center">
           <div className="text-3xl mb-3"><E>📡</E></div>
           <div className="text-zinc-400 font-medium">Waiting for signal...</div>
           <div className="text-zinc-600 text-sm mt-1">Logs will stream here when the booking fires</div>
@@ -424,7 +424,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
               <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <div className="w-3 h-3 rounded-full bg-green-500/80" />
             </div>
-            <span className="text-[11px] text-zinc-500 font-mono ml-2">
+            <span className="text-[11px] text-zinc-500 font-mono ml-2 truncate">
               booking:{snipe.id} — {snipe.venue_name.toLowerCase().replace(/\s+/g, "-")}
             </span>
           </div>
@@ -447,9 +447,9 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                     className={`flex items-start gap-2 px-4 py-1.5 log-line ${hasData ? "cursor-pointer" : ""}`}
                     onClick={() => hasData && toggleLog(log.id)}
                   >
-                    <span className="text-zinc-700 shrink-0 select-none w-[90px]">{timeStr}</span>
-                    <span className="shrink-0 w-4 text-center"><E>{icon}</E></span>
-                    <span className={`shrink-0 w-[68px] ${phaseColors[log.phase] ?? "text-zinc-400"} uppercase text-[11px] font-semibold`}>
+                    <span className="text-zinc-700 shrink-0 select-none w-[56px] sm:w-[90px] truncate">{timeStr}</span>
+                    <span className="shrink-0 w-4 text-center hidden sm:inline"><E>{icon}</E></span>
+                    <span className={`shrink-0 w-[52px] sm:w-[68px] ${phaseColors[log.phase] ?? "text-zinc-400"} uppercase text-[10px] sm:text-[11px] font-semibold truncate`}>
                       {log.phase}
                     </span>
                     <span className={`flex-1 ${isError ? "text-red-400 font-medium" : isWarn ? "text-yellow-400" : isSuccess ? "text-green-400 font-medium" : "text-zinc-300"}`}>
@@ -465,7 +465,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                     )}
                   </div>
                   {isExpanded && hasData && (
-                    <pre className="px-4 py-2 bg-zinc-900/30 text-zinc-500 overflow-x-auto whitespace-pre-wrap break-all border-t border-zinc-800/30 ml-[110px] mr-4 mb-1 rounded text-[11px]">
+                    <pre className="px-4 py-2 bg-zinc-900/30 text-zinc-500 overflow-x-auto whitespace-pre-wrap break-all border-t border-zinc-800/30 ml-2 sm:ml-[110px] mr-4 mb-1 rounded text-[11px]">
                       {JSON.stringify(JSON.parse(log.data!), null, 2)}
                     </pre>
                   )}

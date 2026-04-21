@@ -77,28 +77,28 @@ export default function SettingsPage() {
         {accounts.length > 0 ? (
           <div className="space-y-2">
             {accounts.map((acc) => (
-              <div key={acc.id} className="glass rounded-xl px-4 sm:px-5 py-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-resy-red/30 to-purple-500/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
+              <div key={acc.id} className="glass rounded-xl px-4 sm:px-5 py-4 flex items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-resy-red/30 to-purple-500/30 flex items-center justify-center text-sm font-bold text-white border border-white/10 shrink-0">
                     {(acc.first_name?.[0] ?? acc.email[0]).toUpperCase()}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-medium">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-white font-medium truncate">
                         {acc.first_name} {acc.last_name}
                       </span>
                       {acc.is_default === 1 && (
-                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-500/15 text-blue-400 rounded border border-blue-500/20">
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-500/15 text-blue-400 rounded border border-blue-500/20 shrink-0">
                           DEFAULT
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-zinc-500">{acc.email}</div>
+                    <div className="text-xs text-zinc-500 truncate">{acc.email}</div>
                   </div>
                 </div>
                 <button
                   onClick={() => removeAccount(acc.id)}
-                  className="text-xs text-zinc-600 hover:text-red-400 px-3 py-1.5 hover:bg-red-500/10 rounded-lg transition-all"
+                  className="text-xs text-zinc-600 hover:text-red-400 px-3 py-1.5 hover:bg-red-500/10 rounded-lg transition-all shrink-0"
                 >
                   Remove
                 </button>
@@ -165,22 +165,22 @@ export default function SettingsPage() {
           <span><E>⚙️</E></span>
           <h2 className="text-lg font-semibold text-zinc-200">System</h2>
         </div>
-        <div className="glass rounded-xl p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-zinc-400">Resy API Key</span>
+        <div className="glass rounded-xl p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm text-zinc-400 shrink-0">Resy API Key</span>
             <div className="flex items-center gap-2">
-              <code className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-1 rounded-lg font-mono">
+              <code className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-1 rounded-lg font-mono truncate">
                 VbWk7s3L...7n5
               </code>
-              <span className="w-2 h-2 rounded-full bg-green-500" title="Active" />
+              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active" />
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-zinc-400">Encryption</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm text-zinc-400 shrink-0">Encryption</span>
             <span className="text-xs text-zinc-400">AES-256-GCM</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-zinc-400">Scheduler</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
+            <span className="text-sm text-zinc-400 shrink-0">Scheduler</span>
             <span className="text-xs text-zinc-400">Local (setTimeout) + Vercel Cron ready</span>
           </div>
         </div>
