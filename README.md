@@ -1,4 +1,4 @@
-# Resy Bot 2.0
+# Maître d'
 
 Automated restaurant reservation sniper for [Resy](https://resy.com). Calculates exactly when booking windows open, wakes up at the right moment, and books your preferred table before anyone else can.
 
@@ -196,12 +196,12 @@ scheduled → armed → running → success / failed
 ### Docker
 
 ```bash
-docker build -t resy-bot .
+docker build -t maitred .
 docker run -p 3000:3000 \
   -e RESY_API_KEY=... \
   -e ENCRYPTION_KEY=... \
   -v $(pwd)/data:/data \
-  resy-bot
+  maitred
 ```
 
 The database persists to `/data/resy-sniper.db`.

@@ -37,7 +37,7 @@ export function Nav() {
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
             <span className="text-xl sm:text-2xl"><E>🍽️</E></span>
             <span className="text-sm sm:text-lg font-bold tracking-tight text-white group-hover:text-resy-red-light transition-colors hidden sm:inline">
-              Resy Bot 2.0
+              Maître d'
             </span>
             {activeCount > 0 && (
               <span className="ml-0.5 sm:ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-green-500/20 text-green-400 rounded-full border border-green-500/30 tabular-nums">

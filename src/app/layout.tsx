@@ -3,8 +3,8 @@ import "./globals.css";
 import { Nav } from "@/components/nav";
 
 export const metadata: Metadata = {
-  title: "Resy Bot 2.0",
-  description: "Automated Resy reservation booking",
+  title: "Maître d'",
+  description: "Maître d' — automated Resy reservation booking",
   icons: { icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" },
 };
 

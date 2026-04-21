@@ -39,7 +39,7 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
   const [lines, setLines] = useState<string[]>([]);
   const [fading, setFading] = useState(false);
   const bootLines = [
-    "Initializing Resy Bot 2.0",
+    "Initializing Maître d'",
     "Connecting to Resy API",
     "Loading accounts",
     "Scanning reservations",
@@ -79,7 +79,7 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-            <span className="text-[10px] text-zinc-600 ml-auto font-mono">v2.0</span>
+            <span className="text-[10px] text-zinc-600 ml-auto font-mono">maître d'</span>
           </div>
           <div className="font-mono text-[11px] sm:text-xs space-y-2">
             {lines.map((line, i) => {
@@ -106,7 +106,7 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
       </div>
 
       <p className="text-zinc-700 text-[10px] font-mono mt-6 tracking-wider uppercase">
-        Resy Bot 2.0
+        Maître d'
       </p>
     </div>
   );
@@ -148,7 +148,7 @@ function WelcomeContent({ noAccount, onStart }: { noAccount: boolean; onStart: (
       </div>
 
       <h1 className="text-xl sm:text-3xl font-bold tracking-tight mb-1 text-center anim-in" style={{ animationDelay: "100ms" }}>
-        Resy Bot <span className="text-resy-red">2.0</span>
+        Maître <span className="text-resy-red">d'</span>
       </h1>
       <p className="text-zinc-500 text-xs sm:text-sm max-w-xs sm:max-w-md text-center anim-in" style={{ animationDelay: "200ms" }}>
         Never miss a reservation again. Set your target and let the bot handle the rest.

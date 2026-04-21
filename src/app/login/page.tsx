@@ -35,7 +35,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
           <div className="text-5xl mb-4"><E>🍽️</E></div>
-          <h1 className="text-2xl font-bold tracking-tight">Resy Bot 2.0</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Maître d'</h1>
           <p className="text-zinc-500 text-sm mt-1.5">Enter password to continue</p>
         </div>
         <form onSubmit={submit} className="space-y-4">
