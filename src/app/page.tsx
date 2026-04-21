@@ -42,6 +42,195 @@ const statusConfig: Record<string, { color: string; bg: string; glow: string; ic
   cancelled: { color: "text-zinc-500", bg: "bg-zinc-500/10 border-zinc-500/20", glow: "", icon: "🚫", label: "Cancelled" },
 };
 
+function BootSequence() {
+  const [lines, setLines] = useState<string[]>([]);
+  const bootLines = [
+    "> Initializing Resy Bot 2.0...",
+    "> Connecting to Resy API...",
+    "> Loading accounts...",
+    "> Scanning reservations...",
+    "> Systems online.",
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < bootLines.length) {
+        setLines((prev) => [...prev, bootLines[i]]);
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 200);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center py-16 sm:py-32">
+      <div className="glass rounded-2xl p-5 sm:p-8 w-full max-w-md">
+        <div className="flex items-center gap-1.5 sm:gap-2 mb-4">
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80" />
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80" />
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/80" />
+          <span className="text-[10px] text-zinc-600 ml-2 font-mono">resy-bot v2.0</span>
+        </div>
+        <div className="font-mono text-[11px] sm:text-xs space-y-1.5">
+          {lines.map((line, i) => (
+            <div
+              key={i}
+              className={`animate-fade-in ${i === lines.length - 1 && lines.length === bootLines.length ? "text-green-400" : "text-zinc-400"}`}
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              {line}
+              {i === lines.length - 1 && lines.length < bootLines.length && (
+                <span className="inline-block w-2 h-3.5 bg-resy-red ml-0.5 animate-pulse" />
+              )}
+            </div>
+          ))}
+          {lines.length < bootLines.length && lines.length > 0 && (
+            <span className="inline-block w-2 h-3.5 bg-resy-red animate-pulse" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RadarIcon({ className }: { className?: string }) {
+  return (
+    <div className={`relative ${className}`}>
+      <svg viewBox="0 0 120 120" className="w-full h-full">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(193,39,45,0.15)" strokeWidth="1" />
+        <circle cx="60" cy="60" r="35" fill="none" stroke="rgba(193,39,45,0.1)" strokeWidth="1" />
+        <circle cx="60" cy="60" r="20" fill="none" stroke="rgba(193,39,45,0.08)" strokeWidth="1" />
+        <circle cx="60" cy="60" r="3" fill="rgba(193,39,45,0.6)" />
+        <line x1="60" y1="60" x2="60" y2="10" stroke="rgba(193,39,45,0.4)" strokeWidth="1.5" strokeLinecap="round"
+          style={{ transformOrigin: "60px 60px", animation: "radar-sweep 3s linear infinite" }} />
+        <circle cx="60" cy="60" r="8" fill="none" stroke="rgba(193,39,45,0.3)" strokeWidth="1"
+          style={{ animation: "radar-ping 2s ease-out infinite" }} />
+      </svg>
+    </div>
+  );
+}
+
+function WelcomeHero({ noAccount }: { noAccount: boolean }) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 300),
+      setTimeout(() => setStep(2), 600),
+      setTimeout(() => setStep(3), 900),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center py-8 sm:py-20">
+      {/* Radar animation */}
+      <div className={`transition-all duration-700 ${step >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
+        <RadarIcon className="w-20 h-20 sm:w-36 sm:h-36 mb-4 sm:mb-6" />
+      </div>
+
+      {/* Title */}
+      <div className={`text-center transition-all duration-500 ${step >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight mb-1.5 sm:mb-2">
+          Resy Bot <span className="text-resy-red">2.0</span>
+        </h1>
+        <p className="text-zinc-500 text-xs sm:text-base max-w-md mx-auto">
+          Never miss a reservation again. Set your target and let the bot handle the rest.
+        </p>
+      </div>
+
+      {/* Steps */}
+      <div className={`mt-6 sm:mt-12 w-full max-w-lg transition-all duration-500 ${step >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <div className="grid gap-2.5 sm:gap-4">
+          <StepCard
+            number={1}
+            title={noAccount ? "Connect your Resy account" : "Connect your Resy account"}
+            description={noAccount ? "Add your login credentials to get started" : "Account connected"}
+            done={!noAccount}
+            href="/settings"
+            delay={0}
+          />
+          <StepCard
+            number={2}
+            title="Pick a restaurant & date"
+            description="Search any venue on Resy and choose your ideal time"
+            done={false}
+            href={noAccount ? undefined : "/snipes/new"}
+            delay={100}
+          />
+          <StepCard
+            number={3}
+            title="Let the bot do its thing"
+            description="We'll watch for openings and book the instant one appears"
+            done={false}
+            delay={200}
+          />
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className={`mt-6 sm:mt-10 transition-all duration-500 ${step >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <Link
+          href={noAccount ? "/settings" : "/snipes/new"}
+          className="group relative inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-resy-red to-resy-red-light text-white rounded-2xl text-sm font-semibold transition-all shadow-lg shadow-resy-red/25 hover:shadow-resy-red/40 hover:brightness-110"
+        >
+          {noAccount ? "Connect Resy Account" : "Create Your First Booking"}
+          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function StepCard({
+  number,
+  title,
+  description,
+  done,
+  href,
+  delay,
+}: {
+  number: number;
+  title: string;
+  description: string;
+  done: boolean;
+  href?: string;
+  delay: number;
+}) {
+  const content = (
+    <div
+      className={`glass rounded-xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4 transition-all animate-slide-up ${
+        href ? "hover:border-zinc-500/50 cursor-pointer" : ""
+      } ${done ? "border-green-500/20" : ""}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div
+        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 ${
+          done
+            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+            : "bg-white/5 text-zinc-500 border border-zinc-700/50"
+        }`}
+      >
+        {done ? <E>✓</E> : number}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className={`text-xs sm:text-sm font-medium ${done ? "text-green-400" : "text-zinc-200"}`}>
+          {title}
+        </div>
+        <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">{description}</div>
+      </div>
+      {href && (
+        <span className="text-zinc-600 text-lg shrink-0">›</span>
+      )}
+    </div>
+  );
+
+  return href ? <Link href={href}>{content}</Link> : content;
+}
+
 function Countdown({ target }: { target: string }) {
   const [text, setText] = useState("");
 
@@ -102,24 +291,27 @@ export default function Dashboard() {
   const active = snipes.filter((s) => ["scheduled", "armed", "running"].includes(s.status));
   const past = snipes.filter((s) => ["success", "failed", "cancelled"].includes(s.status) && !s.demo);
 
+  const noAccount = accounts.length === 0;
+  const isEmpty = active.length === 0 && past.length === 0;
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-32">
-        <div className="text-zinc-600 text-sm">Loading...</div>
-      </div>
-    );
+    return <BootSequence />;
+  }
+
+  if (noAccount || isEmpty) {
+    return <WelcomeHero noAccount={noAccount} />;
   }
 
   return (
     <div className="space-y-10">
       {/* Hero */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between animate-fade-in">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-zinc-500 text-sm mt-1">
             {active.length > 0
               ? `${active.length} booking${active.length > 1 ? "s" : ""} queued and ready`
-              : "No active bookings — create one to get started"}
+              : "All quiet — ready for your next booking"}
           </p>
         </div>
         <Link
@@ -133,36 +325,21 @@ export default function Dashboard() {
       {/* Stats */}
       {past.length > 0 && (
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass rounded-xl p-4 text-center animate-scale-in" style={{ animationDelay: "100ms" }}>
             <div className="text-2xl font-bold tabular-nums text-green-400">{past.filter((s) => s.status === "success").length}</div>
             <div className="text-[11px] text-zinc-500 mt-1">Booked</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass rounded-xl p-4 text-center animate-scale-in" style={{ animationDelay: "200ms" }}>
             <div className="text-2xl font-bold tabular-nums text-red-400">{past.filter((s) => s.status === "failed").length}</div>
             <div className="text-[11px] text-zinc-500 mt-1">Failed</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass rounded-xl p-4 text-center animate-scale-in" style={{ animationDelay: "300ms" }}>
             <div className="text-2xl font-bold tabular-nums text-zinc-300">
               {past.filter((s) => s.status === "success").length + past.filter((s) => s.status === "failed").length > 0
                 ? `${Math.round((past.filter((s) => s.status === "success").length / (past.filter((s) => s.status === "success").length + past.filter((s) => s.status === "failed").length)) * 100)}%`
                 : "—"}
             </div>
             <div className="text-[11px] text-zinc-500 mt-1">Success Rate</div>
-          </div>
-        </div>
-      )}
-
-      {accounts.length === 0 && (
-        <div className="glass rounded-xl p-5 border-amber-500/20 flex items-center gap-4">
-          <span className="text-2xl"><E>⚠️</E></span>
-          <div>
-            <div className="text-amber-300 font-medium text-sm">No Resy account connected</div>
-            <div className="text-zinc-400 text-xs mt-0.5">
-              <Link href="/settings" className="text-amber-400 hover:text-amber-300 underline underline-offset-2">
-                Add your Resy login
-              </Link>{" "}
-              to start booking reservations
-            </div>
           </div>
         </div>
       )}
@@ -192,13 +369,13 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* Empty State */}
-      {active.length === 0 && accounts.length > 0 && (
-        <div className="glass rounded-2xl p-8 sm:p-12 text-center">
-          <div className="text-4xl sm:text-5xl mb-4"><E>🎯</E></div>
+      {/* Empty Active State */}
+      {active.length === 0 && (
+        <div className="glass rounded-2xl p-8 sm:p-12 text-center animate-fade-in" style={{ animationDelay: "400ms" }}>
+          <div className="text-4xl sm:text-5xl mb-4 animate-float"><E>🎯</E></div>
           <div className="text-zinc-300 font-medium">No bookings queued</div>
           <div className="text-zinc-500 text-sm mt-1 mb-6">
-            Search for a restaurant and set up your first booking
+            Your next reservation is one click away
           </div>
           <Link
             href="/snipes/new"
