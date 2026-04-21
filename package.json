@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
@@ -22,6 +24,7 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.4"
   }
 }
