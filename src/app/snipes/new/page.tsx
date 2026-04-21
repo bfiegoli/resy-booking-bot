@@ -509,14 +509,14 @@ export default function NewSnipePage() {
                     type="time"
                     value={pref.time}
                     onChange={(e) => updatePreference(i, "time", e.target.value)}
-                    className="input w-[140px]"
+                    className="input !w-[140px] shrink-0"
                   />
                   <input
                     type="text"
                     placeholder="Dining type (optional)"
                     value={pref.dining_type}
                     onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
-                    className="input flex-1"
+                    className="input !w-auto flex-1 min-w-0"
                   />
                   {pref.dining_type && (
                     <button
@@ -530,7 +530,7 @@ export default function NewSnipePage() {
                   {preferences.length > 1 && (
                     <button
                       onClick={() => removePreference(i)}
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm"
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all text-sm shrink-0"
                     >
                       ×
                     </button>
@@ -587,8 +587,8 @@ export default function NewSnipePage() {
           Advanced settings
         </summary>
         <div className="mt-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label={mode === "research" ? "Observation Duration" : "Retry Timeout"} hint={mode === "research" ? "How long to observe slots" : "How long to retry after window opens"}>
+          <div className="flex items-start gap-4">
+            <Field label={mode === "research" ? "Observation Duration" : "Retry Timeout"}>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
@@ -596,13 +596,13 @@ export default function NewSnipePage() {
                   onChange={(e) => setRetryTimeout(Number(e.target.value))}
                   min={5}
                   max={300}
-                  className="input w-24"
+                  className="input !w-24"
                 />
                 <span className="text-xs text-zinc-500">seconds</span>
               </div>
             </Field>
             {mode === "book" && (
-              <Field label="Wake Adjustment" hint="Wake this early before window opens">
+              <Field label="Wake Adjustment">
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -611,9 +611,9 @@ export default function NewSnipePage() {
                     min={0}
                     max={5000}
                     step={100}
-                    className="input w-24"
+                    className="input !w-24"
                   />
-                  <span className="text-xs text-zinc-500">ms</span>
+                  <span className="text-xs text-zinc-500">ms early</span>
                 </div>
               </Field>
             )}
