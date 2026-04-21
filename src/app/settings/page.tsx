@@ -77,7 +77,7 @@ export default function SettingsPage() {
         {accounts.length > 0 ? (
           <div className="space-y-2">
             {accounts.map((acc) => (
-              <div key={acc.id} className="glass rounded-xl px-5 py-4 flex items-center justify-between">
+              <div key={acc.id} className="glass rounded-xl px-4 sm:px-5 py-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-resy-red/30 to-purple-500/30 flex items-center justify-center text-sm font-bold text-white border border-white/10">
                     {(acc.first_name?.[0] ?? acc.email[0]).toUpperCase()}
@@ -117,7 +117,7 @@ export default function SettingsPage() {
           <h3 className="text-sm font-medium text-zinc-300 flex items-center gap-2">
             <span><E>➕</E></span> Add Account
           </h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               type="email"
               placeholder="Resy email"

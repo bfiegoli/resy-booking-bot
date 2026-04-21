@@ -282,17 +282,17 @@ export default function NewSnipePage() {
       <Field label="Restaurant" icon="🍽️">
         {selectedVenueDisplay ? (
           <div className="glass rounded-xl overflow-hidden">
-            <div className="flex">
+            <div className="flex flex-col sm:flex-row">
               {selectedVenueDisplay.image_url && (
                 <img
                   src={selectedVenueDisplay.image_url}
                   alt=""
-                  className="w-28 h-28 object-cover shrink-0"
+                  className="w-full h-32 sm:w-28 sm:h-28 object-cover shrink-0"
                 />
               )}
-              <div className="flex-1 p-4 flex flex-col justify-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-semibold text-lg">{selectedVenueDisplay.name}</span>
+              <div className="flex-1 p-4 flex flex-col justify-center min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-white font-semibold text-base sm:text-lg">{selectedVenueDisplay.name}</span>
                   {selectedVenueDisplay.rating_average > 0 && (
                     <span className="text-xs text-amber-400 font-medium">
                       ★ {selectedVenueDisplay.rating_average.toFixed(1)}
@@ -399,7 +399,7 @@ export default function NewSnipePage() {
 
       {/* Dates + Party Size */}
       {mode === "book" ? (
-        <div className="grid grid-cols-[1fr_160px] gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-4">
           <Field label={`Dates${dates.length > 0 ? ` (${dates.length})` : ""}`} icon="📅" hint="Pick multiple — each becomes its own booking">
             <div className="flex items-center gap-2">
               <input
@@ -506,7 +506,7 @@ export default function NewSnipePage() {
           <div className="space-y-2">
             {preferences.map((pref, i) => (
               <div key={i} className="animate-slide-up space-y-1.5" style={{ animationDelay: `${i * 30}ms` }}>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                     i === 0 ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-zinc-800 text-zinc-500 border border-zinc-700"
                   }`}>
@@ -516,14 +516,14 @@ export default function NewSnipePage() {
                     type="time"
                     value={pref.time}
                     onChange={(e) => updatePreference(i, "time", e.target.value)}
-                    className="input !w-[140px] shrink-0"
+                    className="input !w-[120px] sm:!w-[140px] shrink-0"
                   />
                   <input
                     type="text"
                     placeholder="Dining type (optional)"
                     value={pref.dining_type}
                     onChange={(e) => updatePreference(i, "dining_type", e.target.value)}
-                    className="input !w-auto flex-1 min-w-0"
+                    className="input !w-auto flex-1 min-w-0 basis-[120px]"
                   />
                   {pref.dining_type && (
                     <button
@@ -594,7 +594,7 @@ export default function NewSnipePage() {
           Advanced settings
         </summary>
         <div className="mt-4 space-y-4">
-          <div className="flex items-start gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
             <Field label={mode === "research" ? "Observation Duration" : "Retry Timeout"}>
               <div className="flex items-center gap-2">
                 <input

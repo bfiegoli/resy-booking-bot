@@ -113,9 +113,9 @@ export default function Dashboard() {
   return (
     <div className="space-y-10">
       {/* Hero */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-zinc-500 text-sm mt-1">
             {active.length > 0
               ? `${active.length} booking${active.length > 1 ? "s" : ""} queued and ready`
@@ -124,7 +124,7 @@ export default function Dashboard() {
         </div>
         <Link
           href="/snipes/new"
-          className="px-5 py-2.5 bg-gradient-to-r from-resy-red to-resy-red-light hover:brightness-110 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-resy-red/20 hover:shadow-resy-red/30"
+          className="px-5 py-2.5 bg-gradient-to-r from-resy-red to-resy-red-light hover:brightness-110 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-resy-red/20 hover:shadow-resy-red/30 text-center shrink-0"
         >
           + New Booking
         </Link>
@@ -132,7 +132,7 @@ export default function Dashboard() {
 
       {/* Stats */}
       {past.length > 0 && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div className="glass rounded-xl p-4 text-center">
             <div className="text-2xl font-bold tabular-nums text-green-400">{past.filter((s) => s.status === "success").length}</div>
             <div className="text-[11px] text-zinc-500 mt-1">Booked</div>
@@ -245,15 +245,15 @@ function SnipeCard({
   }
 
   return (
-    <div className={`glass rounded-xl p-5 transition-all hover:border-zinc-600/50 ${isActive ? config.glow : ""}`}>
-      <div className="flex items-start justify-between gap-4">
+    <div className={`glass rounded-xl p-4 sm:p-5 transition-all hover:border-zinc-600/50 ${isActive ? config.glow : ""}`}>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
         <div className="flex-1 min-w-0">
           {/* Title row */}
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
             <span className="text-lg"><E>{config.icon}</E></span>
             <Link
               href={`/snipes/${snipe.id}`}
-              className="text-white font-semibold text-lg hover:text-resy-red-light transition-colors truncate"
+              className="text-white font-semibold text-base sm:text-lg hover:text-resy-red-light transition-colors truncate"
             >
               {snipe.venue_name}
             </Link>
@@ -273,7 +273,7 @@ function SnipeCard({
           </div>
 
           {/* Details row */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm ml-9">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm sm:ml-9">
             <span className="text-zinc-300 font-medium">{new Date(snipe.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>
             {!isResearch && (
               <>
@@ -295,12 +295,12 @@ function SnipeCard({
 
           {/* Countdown */}
           {snipe.booking_window_start && isActive && (
-            <div className="mt-3 ml-9 flex items-center gap-2">
+            <div className="mt-3 sm:ml-9 flex flex-wrap items-center gap-2">
               <span className="text-xs text-zinc-500">Opens in</span>
               <span className={`text-sm font-semibold ${config.color}`}>
                 <Countdown target={snipe.booking_window_start} />
               </span>
-              <span className="text-xs text-zinc-600">
+              <span className="text-xs text-zinc-600 hidden sm:inline">
                 ({new Date(snipe.booking_window_start).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" })})
               </span>
             </div>
@@ -308,7 +308,7 @@ function SnipeCard({
 
           {/* Success */}
           {snipe.reservation_id && (
-            <div className="mt-3 ml-9 flex items-center gap-2 text-green-400">
+            <div className="mt-3 sm:ml-9 flex items-center gap-2 text-green-400">
               <span className="text-sm font-mono">Reservation #{snipe.reservation_id}</span>
             </div>
           )}

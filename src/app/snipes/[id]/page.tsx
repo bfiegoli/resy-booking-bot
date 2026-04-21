@@ -204,12 +204,12 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
       </Link>
 
       {/* Header Card */}
-      <div className={`glass rounded-2xl p-6 ${snipe.status === "success" ? "glow-green" : snipe.status === "failed" ? "glow-red" : snipe.status === "running" ? "glow-purple" : ""}`}>
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-3">
+      <div className={`glass rounded-2xl p-4 sm:p-6 ${snipe.status === "success" ? "glow-green" : snipe.status === "failed" ? "glow-red" : snipe.status === "running" ? "glow-purple" : ""}`}>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
               <span className="text-2xl"><E>{config.icon}</E></span>
-              <h1 className="text-2xl font-bold text-white">{snipe.venue_name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">{snipe.venue_name}</h1>
               <span className={`px-3 py-1 rounded-lg text-xs font-bold border uppercase tracking-wider ${config.bg} ${config.color} ${snipe.status === "running" ? "animate-pulse" : ""}`}>
                 {config.label}
               </span>
@@ -224,7 +224,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm ml-11">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm sm:ml-11">
               <span className="text-zinc-300 font-medium">
                 {new Date(snipe.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
               </span>
@@ -232,15 +232,15 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
                 <>
                   <span className="text-zinc-600">·</span>
                   <span className="text-zinc-400">Party of {snipe.party_size}</span>
-                  <span className="text-zinc-600">·</span>
-                  <span className="text-zinc-400">
+                  <span className="text-zinc-600 hidden sm:inline">·</span>
+                  <span className="text-zinc-400 hidden sm:inline">
                     Prefs: {prefs.map((p, i) => `${i + 1}) ${p.time}${p.dining_type ? " " + p.dining_type : ""}`).join(" → ")}
                   </span>
                 </>
               )}
             </div>
             {snipe.booking_window_start && isActive && (
-              <div className="mt-4 ml-11 glass rounded-lg px-4 py-2.5 inline-flex items-center gap-3">
+              <div className="mt-4 sm:ml-11 glass rounded-lg px-4 py-2.5 inline-flex items-center gap-3">
                 <span className="text-xs text-zinc-500">Booking window opens:</span>
                 <span className={`text-lg font-bold ${config.color}`}>
                   <Countdown target={snipe.booking_window_start} />
@@ -248,12 +248,12 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
             {snipe.reservation_id && (
-              <div className="mt-4 ml-11 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2.5 inline-flex items-center gap-2 glow-green">
-                <span className="text-green-400 font-semibold">Reservation #{snipe.reservation_id}</span>
+              <div className="mt-4 sm:ml-11 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2.5 inline-flex items-center gap-2 glow-green">
+                <span className="text-green-400 font-semibold text-sm sm:text-base">Reservation #{snipe.reservation_id}</span>
               </div>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 shrink-0">
             {isActive && snipe.status !== "running" && (
               <button onClick={runNow} className="px-4 py-2 text-sm bg-purple-500/15 hover:bg-purple-500/25 text-purple-400 rounded-xl transition-all font-medium">
                 <E>⚡</E> Run Now
@@ -274,7 +274,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
         return (
           <div className="space-y-4">
             {/* Summary Stats */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: "Unique Slots", value: summary.total_unique_slots, color: "text-cyan-400" },
                 { label: "Peak Available", value: summary.peak_available, color: "text-green-400" },
@@ -369,11 +369,11 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
       })()}
 
       {/* Log Controls */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-zinc-300 flex items-center gap-2">
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-300 flex items-center gap-2">
             <span><E>📟</E></span> Activity Log
-            <span className="text-xs text-zinc-600 font-normal">({logs.length} entries)</span>
+            <span className="text-xs text-zinc-600 font-normal">({logs.length})</span>
           </h2>
           {errorCount > 0 && (
             <span className="px-2 py-0.5 text-[10px] font-bold bg-red-500/15 text-red-400 rounded-full border border-red-500/20">
@@ -382,7 +382,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
           )}
         </div>
         <div className="flex items-center gap-4">
-          <div className="flex gap-1 bg-zinc-900/50 rounded-lg p-0.5">
+          <div className="flex flex-wrap gap-1 bg-zinc-900/50 rounded-lg p-0.5">
             {[
               { key: "all", label: "All" },
               { key: "errors", label: `Errors${errorCount > 0 ? ` (${errorCount})` : ""}` },
@@ -401,7 +401,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
               </button>
             ))}
           </div>
-          <label className="flex items-center gap-1.5 text-[11px] text-zinc-500 cursor-pointer select-none">
+          <label className="flex items-center gap-1.5 text-[11px] text-zinc-500 cursor-pointer select-none shrink-0">
             <input type="checkbox" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} className="rounded w-3 h-3 accent-zinc-500" />
             Live
           </label>
@@ -430,7 +430,7 @@ export default function SnipeDetailPage({ params }: { params: Promise<{ id: stri
           </div>
 
           {/* Log entries */}
-          <div ref={logContainerRef} className="max-h-[600px] overflow-y-auto font-mono text-[12px] leading-relaxed">
+          <div ref={logContainerRef} className="max-h-[600px] overflow-y-auto overflow-x-auto font-mono text-[11px] sm:text-[12px] leading-relaxed">
             {filteredLogs.map((log, i) => {
               const ts = new Date(log.timestamp);
               const timeStr = ts.toLocaleTimeString("en-US", { hour12: false, fractionalSecondDigits: 3 });
