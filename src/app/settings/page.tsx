@@ -162,32 +162,6 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      {/* System */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <span><E>⚙️</E></span>
-          <h2 className="text-lg font-semibold text-zinc-200">System</h2>
-        </div>
-        <div className="glass rounded-xl p-4 sm:p-5 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-zinc-400 shrink-0">Resy API Key</span>
-            <div className="flex items-center gap-2">
-              <code className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-1 rounded-lg font-mono truncate">
-                VbWk7s3L...7n5
-              </code>
-              <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" title="Active" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-zinc-400 shrink-0">Encryption</span>
-            <span className="text-xs text-zinc-400">AES-256-GCM</span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
-            <span className="text-sm text-zinc-400 shrink-0">Scheduler</span>
-            <span className="text-xs text-zinc-400">Local (setTimeout) + Vercel Cron ready</span>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
