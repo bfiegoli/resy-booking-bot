@@ -182,6 +182,7 @@ export default function Dashboard() {
                 <SnipeCard
                   snipe={snipe}
                   account={accountMap[snipe.account_id]}
+                  accountCount={accounts.length}
                   onCancel={() => cancelSnipe(snipe.id)}
                   onRunNow={() => runNow(snipe.id)}
                 />
@@ -216,7 +217,7 @@ export default function Dashboard() {
           </h2>
           <div className="grid gap-3">
             {past.map((snipe) => (
-              <SnipeCard key={snipe.id} snipe={snipe} account={accountMap[snipe.account_id]} />
+              <SnipeCard key={snipe.id} snipe={snipe} account={accountMap[snipe.account_id]} accountCount={accounts.length} />
             ))}
           </div>
         </section>
@@ -228,11 +229,13 @@ export default function Dashboard() {
 function SnipeCard({
   snipe,
   account,
+  accountCount,
   onCancel,
   onRunNow,
 }: {
   snipe: Snipe;
   account?: Account;
+  accountCount: number;
   onCancel?: () => void;
   onRunNow?: () => void;
 }) {
@@ -285,7 +288,7 @@ function SnipeCard({
                 </span>
               </>
             )}
-            {accounts.length > 1 && account && (
+            {accountCount > 1 && account && (
               <>
                 <span className="text-zinc-500">·</span>
                 <span className="text-zinc-500 text-xs">{account.email}</span>
@@ -343,5 +346,3 @@ function SnipeCard({
     </div>
   );
 }
-
-const accounts: Account[] = [];
