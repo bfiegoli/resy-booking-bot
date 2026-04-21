@@ -14,6 +14,7 @@ type Account = {
 
 export default function SettingsPage() {
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountsLoaded, setAccountsLoaded] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState("");
 
   const loadAccounts = () => {
-    fetch("/api/auth").then((r) => r.json()).then((d) => setAccounts(d.accounts ?? []));
+    fetch("/api/auth").then((r) => r.json()).then((d) => { setAccounts(d.accounts ?? []); setAccountsLoaded(true); });
   };
 
   useEffect(() => { loadAccounts(); }, []);
@@ -71,10 +72,12 @@ export default function SettingsPage() {
         <div className="flex items-center gap-2">
           <span><E>👤</E></span>
           <h2 className="text-lg font-semibold text-zinc-200">Resy Accounts</h2>
-          <span className="text-xs text-zinc-600">{accounts.length} connected</span>
+          {accountsLoaded && <span className="text-xs text-zinc-600">{accounts.length} connected</span>}
         </div>
 
-        {accounts.length > 0 ? (
+        {!accountsLoaded ? (
+          <div />
+        ) : accounts.length > 0 ? (
           <div className="space-y-2">
             {accounts.map((acc) => (
               <div key={acc.id} className="glass rounded-xl px-4 sm:px-5 py-4 flex items-center justify-between gap-2 sm:gap-3">

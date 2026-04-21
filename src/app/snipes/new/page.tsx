@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { E } from "@/components/emoji";
 
 type VenueHit = {
@@ -42,7 +42,15 @@ type Mode = "book" | "research";
 
 const priceRange = ["", "$", "$$", "$$$", "$$$$"];
 
-export default function NewSnipePage() {
+export default function NewSnipePageWrapper() {
+  return (
+    <Suspense>
+      <NewSnipePage />
+    </Suspense>
+  );
+}
+
+function NewSnipePage() {
   const router = useRouter();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountId, setAccountId] = useState<number | null>(null);
@@ -66,8 +74,11 @@ export default function NewSnipePage() {
   const [loadingConfig, setLoadingConfig] = useState(false);
   const [knownDiningTypes, setKnownDiningTypes] = useState<string[]>([]);
 
+  const [accountsLoaded, setAccountsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     fetch("/api/auth")
@@ -77,7 +88,30 @@ export default function NewSnipePage() {
         setAccounts(accs);
         const def = accs.find((a: Account) => a.is_default) ?? accs[0];
         if (def) setAccountId(def.id);
+        setAccountsLoaded(true);
       });
+  }, []);
+
+  // Pre-fill from Discover page
+  useEffect(() => {
+    const venueResyId = searchParams.get("venue_resy_id");
+    const venueName = searchParams.get("venue_name");
+    const date = searchParams.get("date");
+
+    if (venueResyId && venueName) {
+      setQuery(venueName);
+      fetch(`/api/venues/search?q=${encodeURIComponent(venueName)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          const venues: VenueHit[] = d.venues ?? [];
+          const match = venues.find((v) => v.resy_id === Number(venueResyId)) ?? venues[0];
+          if (match) selectVenue(match);
+        });
+    }
+    if (date) {
+      setDates([date]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -266,7 +300,7 @@ export default function NewSnipePage() {
         </Field>
       )}
 
-      {accounts.length === 0 && (
+      {accountsLoaded && accounts.length === 0 && (
         <div className="glass rounded-xl p-5 border-amber-500/20 flex items-center gap-4">
           <span className="text-2xl"><E>⚠️</E></span>
           <div>

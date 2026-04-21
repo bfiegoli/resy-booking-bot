@@ -108,6 +108,12 @@ function migrate(db: Database.Database) {
   if (!colNames.has("research_summary")) {
     db.exec(`ALTER TABLE snipes ADD COLUMN research_summary TEXT`);
   }
+
+  const venueCols = db.prepare("PRAGMA table_info(venues)").all() as Array<{ name: string }>;
+  const venueColNames = new Set(venueCols.map((c) => c.name));
+  if (!venueColNames.has("cache_updated_at")) {
+    db.exec(`ALTER TABLE venues ADD COLUMN cache_updated_at TEXT`);
+  }
 }
 
 export type Account = {
@@ -137,6 +143,7 @@ export type Venue = {
   lead_time_days: number | null;
   booking_hour: number;
   time_zone: string;
+  cache_updated_at: string | null;
   created_at: string;
 };
 

@@ -1,166 +1,312 @@
-# resy-booking-bot
+# Resy Bot 2.0
 
-## Introduction
+Automated restaurant reservation sniper for [Resy](https://resy.com). Calculates exactly when booking windows open, wakes up at the right moment, and books your preferred table before anyone else can.
 
-This is a reservation booking bot designed to snipe reservations from resy.com using the Resy API. New
-reservations become available at midnight everyday, 30 days from the current date. When running the bot, it will sleep
-until midnight and wake up to try to snipe a reservation. It will attempt to grab a reservation for a couple of seconds
-and shutdown, outputting whether is it was or wasn't successful in getting a reservation.
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)
+![SQLite](https://img.shields.io/badge/SQLite-WAL-green?logo=sqlite)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss)
 
-## Usage
-
-Configuration for a bot run is supplied in the `src/main/resources/application.conf` file.
-
-The fields are as follows:
-
-`booking-details`
 ---
-Main configuration section
 
-`auth-token`: Grabs the auth token from an environment variable `API_KEY` - pass this in at runtime.
+## How It Works
 
-`retry-timeout`: Period the bot will attempt to make a reservation for.
+```
+You pick a restaurant + date
+  → Bot calculates when the booking window opens (lead time + timezone-aware)
+  → Bot sleeps until that exact moment
+  → Wakes up, queries Resy API in a tight retry loop
+  → Matches your time/table preferences in priority order
+  → Books the first match
+  → Logs every step with millisecond precision
+```
 
-`api-key`: This is the Resy API key and can be extracted from calls on the website.
-It changes relatively infrequently.
+Most restaurants release reservations on a rolling window (e.g., 30 days out at 9:00 AM ET). The bot handles all of this automatically — lead time detection, timezone math, DST transitions, and sub-second wake timing.
 
-`date`: The date on which you intend to make your booking
+---
 
-`party-size`: Number of people being booked for
+## Features
 
-`venue`: A reference to one of the defined venues in this file. This uses `${venue."<<name>>"}` syntax
-(please note the quoting to correctly reference venue names with punctuation or spaces)
+### Booking Engine
+- **Priority-based preferences** — ranked list of time + dining type combos, matched in order
+- **Sub-second precision** — wakes up early (configurable ms adjustment) and retries in a tight loop
+- **Multi-date support** — queue the same restaurant for multiple dates in one shot
+- **Automatic lead time detection** — fetches from Resy's `/config` endpoint per venue
 
-`preferences`: An ordered collection of `time`s and `dining-type`s that you want to attempt to book.
-These will be matched in order of their definition. Omitting the `dining-type` will infer that you
-don't have a preference of type and will select whatever is available at that time.
+### Discovery Mode
+- Pick a target date, search restaurants by name/cuisine/neighborhood
+- See which booking windows are opening soon with urgency badges:
+  - **Green** — reservations available now
+  - **Red** — opens today
+  - **Amber** — opens within 48 hours
+  - **Blue** — upcoming (3+ days)
+- One-click "Queue Booking" pre-fills the booking form
 
-#### Note
+### Research Mode
+- Observe slot releases without booking anything
+- Tracks every slot: time, dining type, party size range
+- Monitors how quickly slots disappear
+- Generates a summary: total unique slots, peak availability, timeline
 
-Preferences will be strictly applied in the order as defined here and will be applied
-to the ordered data returned from Resty. 
+### Multi-Account
+- Add multiple Resy accounts with encrypted token storage (AES-256-GCM)
+- Select which account books each reservation
+- Default account auto-selected
 
-As an example:
+### Demo Mode
+- Fires in 2 seconds with realistic mock data
+- Tests the full flow (scheduling, wake, find, match, book) without hitting Resy
+- Useful for verifying setup before going live
 
-```hocon
-preferences = [
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router, Turbopack) |
+| Language | TypeScript 5.8 |
+| Database | SQLite via better-sqlite3 (WAL mode) |
+| Styling | Tailwind CSS 4 |
+| Testing | Vitest |
+| Deployment | Docker / Railway / Vercel |
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx                    # Dashboard — splash, stats, active bookings
+│   ├── discover/page.tsx           # Restaurant discovery with urgency badges
+│   ├── login/page.tsx              # Password gate (optional)
+│   ├── settings/page.tsx           # Multi-account management
+│   ├── snipes/
+│   │   ├── new/page.tsx            # Create booking or research run
+│   │   └── [id]/page.tsx           # Snipe detail view + execution logs
+│   └── api/
+│       ├── auth/route.ts           # Account CRUD (login, list, delete)
+│       ├── login/route.ts          # Site password authentication
+│       ├── discover/route.ts       # Search + booking window enrichment
+│       ├── snipes/route.ts         # List + create snipes
+│       ├── snipes/[id]/route.ts    # Get + cancel individual snipe
+│       ├── snipes/[id]/logs/       # Execution log retrieval
+│       ├── snipes/[id]/run/        # Manual trigger
+│       ├── cron/snipe/route.ts     # Vercel cron — checks for due snipes
+│       └── venues/                 # Search, save, config, dining types
+├── components/
+│   ├── nav.tsx                     # Top navigation
+│   └── emoji.tsx                   # Cross-platform emoji wrapper
+├── lib/
+│   ├── resy-api.ts                 # Resy HTTP client (search, find, book)
+│   ├── sniper.ts                   # Core booking logic + retry loop
+│   ├── scheduler.ts                # Timer management + window calculation
+│   ├── db.ts                       # SQLite schema, migrations, types
+│   ├── crypto.ts                   # AES-256-GCM encrypt/decrypt
+│   └── demo-data.ts               # Mock slot generation for demo mode
+├── middleware.ts                   # Password gate + auth cookie
+└── instrumentation.ts             # Loads pending snipes on server start
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/bfiegoli/resy-booking-bot.git
+cd resy-booking-bot
+npm install
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local`:
+
+```env
+# Required
+RESY_API_KEY=VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5
+ENCRYPTION_KEY=<64-char hex string>
+
+# Optional
+SITE_PASSWORD=<password to gate the UI>
+CRON_SECRET=<bearer token for cron endpoint>
+DB_PATH=./resy-sniper.db
+```
+
+Generate an encryption key:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### 3. Run locally
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### 4. First-time setup
+
+1. Go to **Settings** and add your Resy account (email + password)
+2. Go to **New Booking** or **Discover** to find a restaurant
+3. Pick your date(s) and time preferences
+4. The bot handles the rest
+
+---
+
+## Database
+
+SQLite with WAL mode and foreign key constraints. Auto-migrates on first run.
+
+### Tables
+
+| Table | Purpose |
+|-------|---------|
+| `accounts` | Resy login credentials (tokens encrypted at rest) |
+| `venues` | Restaurant metadata + cached lead times (24h TTL) |
+| `snipes` | Booking jobs with status, preferences, and timing |
+| `snipe_logs` | Phase-by-phase execution logs with timestamps |
+| `venue_dining_types` | Known table types per restaurant |
+
+### Snipe Lifecycle
+
+```
+scheduled → armed → running → success / failed
+                            → cancelled (manual)
+```
+
+---
+
+## Deployment
+
+### Docker
+
+```bash
+docker build -t resy-bot .
+docker run -p 3000:3000 \
+  -e RESY_API_KEY=... \
+  -e ENCRYPTION_KEY=... \
+  -v $(pwd)/data:/data \
+  resy-bot
+```
+
+The database persists to `/data/resy-sniper.db`.
+
+### Railway
+
+Push to GitHub and connect the repo in Railway. Add environment variables in the Railway dashboard. Use a persistent volume mounted at `/data` for the SQLite database.
+
+### Vercel
+
+Works with Vercel's serverless functions. The cron job (`vercel.json`) fires every minute to check for due snipes:
+
+```json
+{
+  "crons": [
     {
-        time = "19:00"
-        dining-type = "Dining Room"
-    },
-    {
-        time = "19:00"
+      "path": "/api/cron/snipe",
+      "schedule": "* * * * *"
     }
-]
+  ]
+}
 ```
 
-will match exactly against a 7pm booking for the "Dining Room" and failing that
-will fallback to a 7pm booking for any table type.
+> **Note:** SQLite on Vercel uses ephemeral `/tmp` storage. For production persistence, swap to Turso or Vercel Postgres.
 
-```hocon
-preferences = [
-  {
-    time = "19:00"
-  },
-  {
-    time = "18:00",
-    dining-type = "Indoor"
-  }
-]
-```
-
-will match any booking at 7pm and failing that look for an Indoor booking at 6pm.
-Please ensure that preferences are carefully set in the order required to maximise
-potential for sniping.
-
-Note also that times are _EXACT MATCHES_ there is no fuzziness with bookings (at present)
-so be careful when attempting to snipe that you are aware of the times the restaurant
-releases.
-
-`venues`
 ---
-A list of all venues that you potentially want to book for.
-Each entry should have a name uniquely identifying it. These are configured as the human readable
-venue names for ease of configuration.
 
-`id`: Resy's internal Id for the venue
+## API Routes
 
-`name`: The name of the venue
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth` | GET | List all accounts |
+| `/api/auth` | POST | Login to Resy + save account |
+| `/api/auth` | DELETE | Remove account |
+| `/api/login` | POST | Site password auth |
+| `/api/snipes` | GET | List snipes (filter by `?status=`) |
+| `/api/snipes` | POST | Create + arm a new snipe |
+| `/api/snipes/[id]` | GET | Snipe details |
+| `/api/snipes/[id]` | DELETE | Cancel snipe |
+| `/api/snipes/[id]/run` | POST | Manually trigger execution |
+| `/api/snipes/[id]/logs` | GET | Execution logs |
+| `/api/cron/snipe` | GET | Cron trigger for serverless scheduling |
+| `/api/discover` | GET | Search venues + compute booking windows |
+| `/api/venues/search` | GET | Search Resy by name |
+| `/api/venues/search` | POST | Save venue to local DB |
+| `/api/venues/[id]/config` | GET | Fetch lead time from Resy |
+| `/api/venues/[id]/dining-types` | GET | Known dining types |
 
-`advance`: How far in advance you can make bookings for this venue (informational only - the bot will verify advance
-booking windows)
+---
 
-`hour-of-day-to-start-booking`: Hour at which new bookings are released (0 = midnight) NB: see timezone below
+## How Booking Windows Work
 
-`dining-types`: List of supported dining-types (NB: this isn't validated and is for general information when setting
-your preferences)
+Resy restaurants have a **lead time** (e.g., 14 days) and a **booking hour** (e.g., 9:00 AM). If you want to dine on May 15 and the restaurant has a 14-day lead time opening at 9 AM ET:
 
-`info`: Any other human readable info about the venue (Not used by the bot)
+```
+Target date:     May 15
+Lead time:       14 days
+Booking opens:   May 1 at 9:00:00 AM ET
+Bot wakes:       May 1 at 8:59:59.500 AM ET (500ms early)
+Bot starts loop: Queries /find every ~200ms
+First match:     Books immediately
+```
 
-`time-zone`: The timezone in which the restaurant is located - used for establishing sleep periods for
-the bot.
+The `computeBookingWindowStart()` function uses binary search with `Intl.DateTimeFormat` to correctly resolve the UTC timestamp for any timezone, including across DST boundaries.
 
-#### Note:
-The bot now has functionality built in to establish the user's current timezone and the offset to the
-restaurant being booked (based on the `time-zone` configured for the venue). This allows for bookings to
-be made whilst in a different timezone without having to adjust when the booking window will open for the
-venue. Please ensure that any restaurants configured have correct time-zone information set (defaults to
-US/East time).
+---
 
-## Execution
-The main entry point of the bot is in ResyBookingBot under the main function. Upon running the bot, it will
-evaluate your `application.conf` file and determine if the booking date is open for a reservation.
-If the reservation window is not et open, the system will evaluate how long it needs to sleep before attempting to
-snipe.
+## Preferences
 
-Upon waking, the bot will attempt to secure a reservation for a period of 10 seconds to cover any variation in release
-times.
+Time preferences are matched in priority order against available slots:
 
-When times are retrieved, it will try to find the best available time slot given your priority list of reservation
-times.  
+```json
+[
+  { "time": "19:00", "dining_type": "Dining Room" },
+  { "time": "19:00" },
+  { "time": "20:00", "dining_type": "Patio" }
+]
+```
 
-If a time can be booked, it will make an attempt to snipe it.
-Otherwise it will report that it was unable to acquire a reservation.  
-In the event it was unable to get any reservations for 10 seconds, the bot will automatically shutdown.
+This means: first try 7 PM Dining Room, then any 7 PM table, then 8 PM Patio. The bot picks the first match from whatever Resy returns.
 
-## Repository Configuration For Github Workflows
+---
 
-### Github Actions
+## Security
 
-Enable GitHub actions for the repository under:
+- **Token encryption** — Resy auth tokens stored with AES-256-GCM (IV + auth tag + ciphertext)
+- **Site password** — Optional middleware gate (set `SITE_PASSWORD` env var)
+- **Cron auth** — Optional `CRON_SECRET` bearer token for the scheduling endpoint
+- **No tokens in logs** — Execution logs capture timing and results, never credentials
 
-`Settings >> Code and automation >> Actions >> General >> Actions permissions`
-* check `Allow all actions and reusable workflows`
+---
 
-`Settings >> Code and automation >> Actions >> General >> Workflow permissions`
-* Check `Read and write permissions`
+## Scripts
 
-### Scala CI
-This action builds and tests the project and reports back on status and code coverage.
+```bash
+npm run dev          # Start dev server (Turbopack)
+npm run build        # Production build
+npm start            # Start production server
+npm test             # Run tests
+npm run test:watch   # Watch mode
+npm run lint         # Lint
+```
 
-It is triggered on Pull Requests and merges to master branch.
+---
 
-#### formatting
-Verifies the file formatting complies with the rules defined in the `.scalafmt.conf` file.
+## License
 
-#### build
-Builds, tests and reports coverage of the project.
-
-#### JUnit Test Report
-Exposes the test report in the actions status.
-
-### Release
-This action runs on a commit to the master branch only.
-
-#### publish
-Tags the repository with a new version number and produces release artifacts (jar files).
-
-### Codecov
-Provides code coverage reports for your repositories. Used in the Scala CI pipeline.
-
-Sign up here: https://about.codecov.io/sign-up/
-
-Codecov is free for the developer plan which is sufficient for working with the bot.
-
-You will need to grant the codecov app access to the repository and additionally define
-and setup a secret holidng your CODECOV_TOKEN (see documentation)
+MIT

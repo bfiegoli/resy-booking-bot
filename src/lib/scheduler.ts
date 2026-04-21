@@ -21,7 +21,7 @@ function log(
   console.log(`[SCHEDULER] [snipe:${snipeId}] ${message}`);
 }
 
-function computeBookingWindowStart(
+export function computeBookingWindowStart(
   date: string,
   leadTimeDays: number,
   bookingHour: number,

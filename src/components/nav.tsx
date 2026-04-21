@@ -7,6 +7,7 @@ import { E } from "@/components/emoji";
 
 const links = [
   { href: "/", label: "Dashboard", icon: "🎯" },
+  { href: "/discover", label: "Discover", icon: "🔍" },
   { href: "/snipes/new", label: "New Booking", icon: "➕" },
   { href: "/settings", label: "Settings", icon: "⚙️" },
 ];
@@ -63,9 +64,6 @@ export function Nav() {
               );
             })}
           </div>
-        </div>
-        <div className="text-[10px] text-zinc-600 font-mono hidden sm:block">
-          v1.0
         </div>
       </div>
     </nav>
