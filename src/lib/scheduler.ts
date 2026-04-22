@@ -4,6 +4,8 @@ import { getVenueConfig } from "./resy-api";
 import { executeSnipe } from "./sniper";
 
 const activeTimers = new Map<number, NodeJS.Timeout>();
+// setTimeout uses a 32-bit signed int — delays beyond this fire immediately
+const MAX_TIMEOUT = 2 ** 31 - 1;
 
 function log(
   snipeId: number,
@@ -160,14 +162,22 @@ export async function armSnipe(snipe: Snipe): Promise<void> {
     clearTimeout(activeTimers.get(snipe.id)!);
   }
 
-  const timer = setTimeout(() => {
-    activeTimers.delete(snipe.id);
-    fireSnipe(snipe);
-  }, msUntilWake);
+  const scheduleWithSafeDelay = (delay: number) => {
+    if (delay > MAX_TIMEOUT) {
+      const timer = setTimeout(() => scheduleWithSafeDelay(delay - MAX_TIMEOUT), MAX_TIMEOUT);
+      timer.unref?.();
+      activeTimers.set(snipe.id, timer);
+    } else {
+      const timer = setTimeout(() => {
+        activeTimers.delete(snipe.id);
+        fireSnipe(snipe);
+      }, delay);
+      timer.unref?.();
+      activeTimers.set(snipe.id, timer);
+    }
+  };
 
-  // Don't let the timer keep the process alive if everything else is done
-  timer.unref?.();
-  activeTimers.set(snipe.id, timer);
+  scheduleWithSafeDelay(msUntilWake);
 }
 
 async function fireSnipe(snipe: Snipe) {

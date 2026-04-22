@@ -174,13 +174,14 @@ async function executeResearch(snipe: Snipe): Promise<SnipeResult> {
   const timeline: Array<{ ms: number; available: number }> = [];
   let sweepCount = 0;
   let peakAvailable = 0;
+  let consecutiveErrors = 0;
 
-  // Sweep interval: fast at first (catch the drop), then slow down
+  const MAX_CONSECUTIVE_ERRORS = 10;
+
   const getSweepDelay = (elapsed: number) => {
-    if (elapsed < 5000) return 200;
-    if (elapsed < 15000) return 500;
-    if (elapsed < 30000) return 1000;
-    return 2000;
+    if (elapsed < 10000) return 2000;
+    if (elapsed < 30000) return 3000;
+    return 5000;
   };
 
   while (performance.now() < deadline) {
@@ -190,10 +191,36 @@ async function executeResearch(snipe: Snipe): Promise<SnipeResult> {
     const result = await doFind(snipe, apiKey, authToken, venue.resy_id);
 
     if (!result.ok) {
-      log(snipe.id, "warn", "find", `Sweep #${sweepCount}: API error`, { error: result.error }, result.duration_ms);
-      await new Promise((r) => setTimeout(r, 500));
+      consecutiveErrors++;
+      log(snipe.id, "warn", "find", `Sweep #${sweepCount}: API error`, { status: result.status, error: result.error }, result.duration_ms);
+
+      if ([401, 403].includes(result.status)) {
+        const reason = result.status === 401
+          ? "Unauthorized — your Resy auth token is expired or invalid. Re-add your account in Settings."
+          : "Forbidden — Resy rejected your credentials. Re-add your account in Settings.";
+        log(snipe.id, "error", "find", `HTTP ${result.status} — ${reason}`, { raw: result.raw.slice(0, 1000) });
+        db.prepare("UPDATE snipes SET status = 'failed', updated_at = datetime('now') WHERE id = ?").run(snipe.id);
+        return { success: false, reservation_id: null, reason, total_attempts: sweepCount, total_duration_ms: Math.round(performance.now() - researchStart), slots_seen: 0 };
+      }
+
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS && result.status >= 500) {
+        const reason = `Resy server error (HTTP ${result.status}) — ${consecutiveErrors} consecutive failures`;
+        log(snipe.id, "error", "find", `${consecutiveErrors} consecutive server errors (HTTP ${result.status}) — Resy may be blocking requests. Aborting.`, {
+          raw: result.raw.slice(0, 1000),
+        });
+        db.prepare("UPDATE snipes SET status = 'failed', updated_at = datetime('now') WHERE id = ?").run(snipe.id);
+        return { success: false, reservation_id: null, reason, total_attempts: sweepCount, total_duration_ms: Math.round(performance.now() - researchStart), slots_seen: 0 };
+      }
+
+      if (result.status >= 500) {
+        await new Promise((r) => setTimeout(r, Math.min(consecutiveErrors * 500, 3000)));
+      } else {
+        await new Promise((r) => setTimeout(r, 500));
+      }
       continue;
     }
+
+    consecutiveErrors = 0;
 
     const venues = result.data?.results?.venues ?? [];
     const slots = venues.flatMap((v) => v.slots ?? []);
@@ -323,8 +350,10 @@ async function executeBook(snipe: Snipe): Promise<SnipeResult> {
   let totalSlotsEverSeen = 0;
   let lastSlotsSeen: string[] = [];
   const allUniqueSlots = new Set<string>();
+  let consecutiveErrors = 0;
 
   const BURST_SIZE = 5;
+  const MAX_CONSECUTIVE_ERRORS = 10;
 
   while (performance.now() < deadline) {
     const burstCount = attempt === 0 ? BURST_SIZE : 1;
@@ -348,27 +377,55 @@ async function executeBook(snipe: Snipe): Promise<SnipeResult> {
     const findResult = fastestOk ?? findResults[0];
 
     if (!findResult.ok) {
+      consecutiveErrors++;
       log(snipe.id, "warn", "find", `Attempt #${attempt}: API error (${findResult.duration_ms}ms)`, {
         status: findResult.status,
         error: findResult.error,
       }, findResult.duration_ms);
 
-      if (findResult.status === 412) {
-        log(snipe.id, "error", "find", "HTTP 412 — you may already have a reservation at this venue", {
+      const fatalStatus = [401, 403, 412];
+      if (fatalStatus.includes(findResult.status)) {
+        const reasons: Record<number, string> = {
+          401: "Unauthorized — your Resy auth token is expired or invalid. Re-add your account in Settings.",
+          403: "Forbidden — Resy rejected your credentials. Re-add your account in Settings.",
+          412: "Already have a reservation at this venue (HTTP 412)",
+        };
+        log(snipe.id, "error", "find", `HTTP ${findResult.status} — ${reasons[findResult.status]}`, {
           raw: findResult.raw.slice(0, 1000),
         });
         db.prepare("UPDATE snipes SET status = 'failed', updated_at = datetime('now') WHERE id = ?").run(snipe.id);
         return {
           success: false,
           reservation_id: null,
-          reason: "Already have a reservation at this venue (HTTP 412)",
+          reason: reasons[findResult.status]!,
           total_attempts: attempt,
           total_duration_ms: Math.round(performance.now() - snipeStart),
           slots_seen: totalSlotsEverSeen,
         };
       }
+
+      if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS && findResult.status >= 500) {
+        log(snipe.id, "error", "find", `${consecutiveErrors} consecutive server errors (HTTP ${findResult.status}) — Resy may be blocking requests. Aborting.`, {
+          raw: findResult.raw.slice(0, 1000),
+        });
+        db.prepare("UPDATE snipes SET status = 'failed', updated_at = datetime('now') WHERE id = ?").run(snipe.id);
+        return {
+          success: false,
+          reservation_id: null,
+          reason: `Resy server error (HTTP ${findResult.status}) — ${consecutiveErrors} consecutive failures`,
+          total_attempts: attempt,
+          total_duration_ms: Math.round(performance.now() - snipeStart),
+          slots_seen: totalSlotsEverSeen,
+        };
+      }
+
+      if (findResult.status >= 500) {
+        await new Promise((r) => setTimeout(r, Math.min(consecutiveErrors * 500, 3000)));
+      }
       continue;
     }
+
+    consecutiveErrors = 0;
 
     const venues = findResult.data?.results?.venues ?? [];
     const slots = venues.flatMap((v) => v.slots ?? []);
